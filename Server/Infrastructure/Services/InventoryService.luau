@@ -92,6 +92,7 @@ function InventoryService:equipItem(userId, itemId, slotName)
         return false, "Item not found in inventory"
     end
 
+    warn(inventory, userId, itemId, slotName)
     -- Получить слот экипировки
     local slot = self.EquipmentSlot.getByName(slotName)
     if not slot then

@@ -1,5 +1,4 @@
 local DataStorePlayerRepository = require(script.DataStorePlayerRepository)
-local ItemDefinitions = require(script.ItemDefinitions)
 local InventoryRepository = require(script.InventoryRepository)
 
 ---@class ServerInfrastructureRepositories
@@ -16,11 +15,7 @@ function ServerInfrastructureRepositories.new(diContainer)
 end
 
 function ServerInfrastructureRepositories:init()
-	-- Регистрация ItemDefinitions
-	self.diContainer:singleton("ItemDefinitions", function()
-		return ItemDefinitions.new()
-	end)
-
+	
 	-- Регистрация InventoryRepository
 	self.diContainer:singleton("InventoryRepository", function(container)
 		local logger = container:resolve("Logger")

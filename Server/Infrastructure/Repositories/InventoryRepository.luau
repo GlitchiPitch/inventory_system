@@ -51,10 +51,19 @@ function InventoryRepository:getByPlayerId(userId)
 	end
 
 	-- Создать объект Inventory из данных
+	-- Преобразовать Amulets из формата {name: count} в [{id: name, count: count}]
+	local amuletsData = inventoryData["Amulets"] or {}
+	local inventorySlotsArray = {}
+	for name, count in pairs(amuletsData) do
+		table.insert(inventorySlotsArray, {
+			id = name,
+			count = count
+		})
+	end
 
 	local inventory = self.InventoryEntity.fromDataStructure({
 		equippedItems = inventoryData.EquippedAccessories or {},
-		inventorySlots = inventoryData["Amulets"] or {},
+		inventorySlots = inventorySlotsArray,
 	})
 
 	-- Добавить в кэш
@@ -84,7 +93,7 @@ function InventoryRepository:save(userId, inventory)
 	end
 
 	-- Сохранить данные инвентаря
-	metaPlayer.Data.Inventory["EquippedAccessories"] = inventory:toDataStructure()
+	metaPlayer.Data.Inventory["EquippedAccessories"] = inventory:toDataStructure().equippedItems
 
 	self.logger:info("InventoryRepository", "Saved inventory for userId: " .. userId)
 end
