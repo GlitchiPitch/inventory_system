@@ -53,17 +53,17 @@ function InventoryRepository:getByPlayerId(userId)
 	-- Создать объект Inventory из данных
 	-- Преобразовать Amulets из формата {name: count} в [{id: name, count: count}]
 	local amuletsData = inventoryData["Amulets"] or {}
-	local inventorySlotsArray = {}
+	local inventorySlots = {}
 	for name, count in pairs(amuletsData) do
-		table.insert(inventorySlotsArray, {
+		inventorySlots[name]= {
 			id = name,
 			count = count
-		})
+		}
 	end
 
 	local inventory = self.InventoryEntity.fromDataStructure({
 		equippedItems = inventoryData.EquippedAccessories or {},
-		inventorySlots = inventorySlotsArray,
+		inventorySlots = inventorySlots,
 	})
 
 	-- Добавить в кэш

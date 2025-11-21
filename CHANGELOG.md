@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.4] - 2025-11-21
+
+### Added
+- **Fruits System**: New FruitsList with 20 different fruits (Void, Titan, Tesla, etc.) with asset IDs
+- **Extended Amulets**: Added elemental stones and crystals (Earth Stone, Fire Crystal, Ice Shard, etc.)
+- **Network Synchronization**: Complete InventoryRemoteService for client-server communication
+- **Server Inventory Logic**: Full server-side inventory management with validation and persistence
+- **Remote Event Handlers**: Event-driven architecture for inventory operations (add, remove, equip, unequip)
+
+### Changed
+- **Inventory Service**: Enhanced with comprehensive item validation and business logic
+- **Equipment System**: Improved equip/unequip operations with server-side validation
+- **Data Structure**: Extended item definitions to include both amulets and fruits
+
+### Fixed
+- **Item Validation**: Server-side validation for all inventory operations
+- **Network Communication**: Proper error handling and client updates for all operations
+
+### Technical Details
+- **Remote Events**: 5 core inventory events (GetInventory, AddItem, RemoveItem, EquipItem, UnequipItem)
+- **Server Validation**: Business rules validation for item existence, counts, and equipment compatibility
+- **Data Persistence**: MetaService integration for all inventory state changes
+
+### Next Steps
+- Complete client-side UI implementation (drag-and-drop interface)
+- Implement visual feedback and item tooltips
+- Add inventory filtering and sorting capabilities
+
 ## [0.0.3] - 2025-11-21
 
 ### Changed

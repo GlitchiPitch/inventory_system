@@ -18,8 +18,9 @@ function Services:_registerServices()
 	-- Регистрация InventoryService
 	self.diContainer:singleton("InventoryService", function(container)
 		local inventoryRepository = container:resolve("InventoryRepository")
-		local itemDefinitions = container:resolve("ItemDefinitions")
-		return InventoryService.new(inventoryRepository, itemDefinitions)
+		local amuletsList = container:resolve("Shared.Data").AmuletsList
+		local equipmentSlot = container:resolve("Shared.Domain").entities.EquipmentSlot
+		return InventoryService.new(inventoryRepository, amuletsList, equipmentSlot)
 	end)
 
 	-- Регистрация InventoryRemoteService

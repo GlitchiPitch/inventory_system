@@ -1,18 +1,18 @@
 ---@class InventoryService
 ---@field inventoryRepository InventoryRepository
----@field itemDefinitions table<string, ItemEntity>?
+---@field amuletsList table<string, string>
 ---@field EquipmentSlot EquipmentSlotEntity?
 local InventoryService = {}
 InventoryService.__index = InventoryService
 
 ---@param inventoryRepository InventoryRepository
----@param itemDefinitions table<string, ItemEntity>?
+---@param amuletsList table<string, string>
 ---@param EquipmentSlot EquipmentSlotEntity?
 ---@return InventoryService
-function InventoryService.new(inventoryRepository, itemDefinitions, EquipmentSlot)
+function InventoryService.new(inventoryRepository, amuletsList, EquipmentSlot)
     local self = setmetatable({}, InventoryService)
     self.inventoryRepository = inventoryRepository
-    self.itemDefinitions = itemDefinitions or {}
+    self.amuletsList = amuletsList or {}
     self.EquipmentSlot = EquipmentSlot
     return self
 end
@@ -35,12 +35,9 @@ function InventoryService:addItem(userId, itemId, count)
         return false, "Invalid item count"
     end
 
-    -- Валидация предмета (если есть определения)
-    if self.itemDefinitions[itemId] then
-        local item = self.itemDefinitions[itemId]
-        if item:getMaxStack() > 0 and count > item:getMaxStack() then
-            return false, "Item count exceeds maximum stack size"
-        end
+    -- Валидация предмета - проверить что он существует в списке амулетов
+    if not self.amuletsList[itemId] then
+        return false, "Unknown item"
     end
 
     local success = self.inventoryRepository:addItemToPlayer(userId, itemId, count)
@@ -94,31 +91,19 @@ function InventoryService:equipItem(userId, itemId, slotName)
 
     warn(inventory, userId, itemId, slotName)
     -- Получить слот экипировки
-    local slot = self.EquipmentSlot.getByName(slotName)
+    local slot = self.EquipmentSlot:getByName(slotName)
     if not slot then
         return false, "Invalid equipment slot"
     end
 
-    -- Валидация типа предмета (если есть определения)
-    if self.itemDefinitions[itemId] then
-        local item = self.itemDefinitions[itemId]
-        if not item:canBeEquipped() then
-            return false, "Item cannot be equipped"
-        end
+    -- Валидация предмета - проверить что он существует и может быть экипирован
+    if not self.amuletsList[itemId] then
+        return false, "Unknown item"
+    end
 
-        if not slot:canEquipItemType(item:getType()) then
-            return false, "Item type not allowed in this slot"
-        end
-
-        -- Проверить, что предмет подходит для этого слота
-        if item:getEquipmentSlot() and item:getEquipmentSlot():getName() ~= slotName then
-            return false, "Item can only be equipped in specific slot"
-        end
-    else
-        -- Базовая проверка для предметов без определений
-        if not slot:canEquipItemType("weapon") then
-            return false, "Only weapons can be equipped"
-        end
+    -- Все амулеты в этой игре считаются "оружием" и могут быть экипированы в соответствующие слоты
+    if not slot:canEquipItemType("weapon") then
+        return false, "Item cannot be equipped in this slot"
     end
 
     local success = self.inventoryRepository:equipItem(userId, itemId, slot)
@@ -139,7 +124,7 @@ function InventoryService:unequipItem(userId, slotName)
     end
 
     -- Получить слот экипировки
-    local slot = self.EquipmentSlot.getByName(slotName)
+    local slot = self.EquipmentSlot:getByName(slotName)
     if not slot then
         return false, "Invalid equipment slot"
     end

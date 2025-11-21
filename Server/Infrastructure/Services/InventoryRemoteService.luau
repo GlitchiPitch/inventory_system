@@ -117,7 +117,7 @@ function InventoryRemoteService:handleEquipItem(player, args)
     local userId = tostring(player.UserId)
     local itemId = args.itemId
     local slotName = args.slotName
-
+    
     if not itemId or not slotName then
         self.remoteEventService:fireClient(player, "Error", {message = "ItemId and slotName are required"})
         return

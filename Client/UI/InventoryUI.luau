@@ -66,22 +66,25 @@ end
 function InventoryUI:setupEquipmentSlots()
 	for _, slotData in ipairs(self.EquipmentSlotEntity.getAllSlots()) do
 		local slotButton = self.equipmentFrame:FindFirstChild("EquipSlot_" .. slotData.name)
-		local slot = self.EquipmentSlotEntity.new(slotData.name, slotData.displayName, slotData.allowedItemTypes, slotButton)
+		local slot =
+			self.EquipmentSlotEntity.new(slotData.name, slotData.displayName, slotData.allowedItemTypes, slotButton)
 		table.insert(self.equipmentSlots, slot)
 	end
 end
 
 function InventoryUI:createSlots(inventoryData)
 	warn(inventoryData)
-	self.itemSlots = {} -- Инициализируем массив UI слотов
 
-	for i, slotData in ipairs(inventoryData.inventorySlots) do
+	-- Очищаем существующие слоты перед созданием новых
+	self:clearSlots()
+
+	for slotName, slotData in pairs(inventoryData.inventorySlots) do
 		local slot = self.slotTemplate:Clone()
-		slot.Name = slotData.id
+		slot.Name = slotName
 		slot.CountLabel.Text = slotData.count
 		slot.Parent = self.inventoryFrame
-		slot.ItemNameLabel.Text = slotData.id
-		slot.ItemIcon.Image = `rbxassetid://{self.amuletsList[slotData.id] or 0}`
+		slot.ItemNameLabel.Text = slotName
+		slot.ItemIcon.Image = `rbxassetid://{self.amuletsList[slotName] or 0}`
 		slot.Visible = true
 
 		-- Проверяем, экипирован ли предмет, и показываем Checkmark
@@ -91,7 +94,7 @@ function InventoryUI:createSlots(inventoryData)
 			local isEquipped = false
 			if currentInventoryData and currentInventoryData.equippedItems then
 				for _, equippedItemId in pairs(currentInventoryData.equippedItems) do
-					if equippedItemId == slotData.id then
+					if equippedItemId == slotName then
 						isEquipped = true
 						break
 					end
@@ -101,10 +104,10 @@ function InventoryUI:createSlots(inventoryData)
 		end
 
 		slot.MouseButton1Click:Connect(function()
-			self:onSlotClicked(i) -- Передаем индекс вместо имени
+			self:onSlotClicked(slotName) -- Передаем индекс вместо имени
 		end)
 
-		local item = self.ItemEntity.new(slotData.id, slotData.id, "weapon", slot)
+		local item = self.ItemEntity.new(slotName, slotName, "weapon", slot)
 		table.insert(self.inventorySlots, item)
 		table.insert(self.itemSlots, slot) -- Добавляем UI слот в массив
 	end
@@ -122,6 +125,7 @@ function InventoryUI:setupEventHandlers()
 	-- Обработчик обновления инвентаря
 	self.inventoryClientService:setOnInventoryUpdated(function(inventoryData)
 		self:createSlots(inventoryData)
+		self:updateEquipmentSlots()
 	end)
 
 	-- Обработчик успешной экипировки
@@ -167,21 +171,44 @@ function InventoryUI:onSlotClicked(slotIndex)
 
 	local slotData = inventoryData.inventorySlots[slotIndex]
 	if slotData then
-		-- Находим свободную ячейку экипировки
-		local freeSlot = self:findFreeEquipmentSlot(slotData.id)
-		if freeSlot then
-			-- Отправляем запрос на экипировку
-			self.inventoryClientService:requestEquipItem(slotData.id, freeSlot:getName())
-			print("Attempting to equip", slotData.id, "to", freeSlot:getName())
+		-- Проверяем, экипирован ли уже этот предмет
+		local isEquipped = false
+		local equippedSlotName = nil
+		if inventoryData.equippedItems then
+			for slotName, equippedItemId in pairs(inventoryData.equippedItems) do
+				print("Checking equipped item:", slotName, "=", equippedItemId, "vs", slotData.id)
+				if equippedItemId == slotData.id then
+					isEquipped = true
+					equippedSlotName = slotName
+					print("Found equipped item!", slotData.id, "is equipped in", slotName)
+					break
+				end
+			end
+		end
+
+		print("Item", slotData.id, "isEquipped:", isEquipped, "equippedSlotName:", equippedSlotName)
+
+		if isEquipped then
+			-- Предмет уже экипирован, снимаем его
+			self.inventoryClientService:requestUnequipItem(equippedSlotName)
+			print("Attempting to unequip", slotData.id, "from", equippedSlotName)
 		else
-			print("No free equipment slot available for item", slotData.id)
+			-- Предмет не экипирован, ищем свободный слот
+			local freeSlot = self:findFreeEquipmentSlot()
+			if freeSlot then
+				-- Отправляем запрос на экипировку
+				self.inventoryClientService:requestEquipItem(slotData.id, freeSlot:getName())
+				print("Attempting to equip", slotData.id, "to", freeSlot:getName())
+			else
+				print("No free equipment slot available for item", slotData.id)
+			end
 		end
 	else
 		print("No item data found for slot", slotIndex)
 	end
 end
 
-function InventoryUI:findFreeEquipmentSlot(itemId) -- itemId зарезервировано для будущей логики определения типа предмета
+function InventoryUI:findFreeEquipmentSlot() -- itemId зарезервировано для будущей логики определения типа предмета
 	local inventoryData = self.inventoryClientService:getInventoryData()
 	if not inventoryData or not inventoryData.equippedItems then
 		return nil
@@ -215,7 +242,6 @@ function InventoryUI:onEquipmentSlotClicked(slotName)
 	print("Equipping", self.draggedItem.id, "to", slotName)
 end
 
-
 function InventoryUI:onItemEquipped(itemId)
 	print("Item equipped:", itemId)
 
@@ -230,6 +256,9 @@ function InventoryUI:onItemEquipped(itemId)
 			break
 		end
 	end
+
+	-- Обновляем слоты экипировки
+	self:updateEquipmentSlots()
 end
 
 function InventoryUI:onItemUnequipped(itemId)
@@ -246,6 +275,9 @@ function InventoryUI:onItemUnequipped(itemId)
 			break
 		end
 	end
+
+	-- Обновляем слоты экипировки
+	self:updateEquipmentSlots()
 end
 
 function InventoryUI:updateEquipmentSlots()
@@ -254,14 +286,21 @@ function InventoryUI:updateEquipmentSlots()
 		return
 	end
 
-	for slotName, slotButton in pairs(self.equipmentSlots) do
-		local equippedIcon = slotButton:FindFirstChild("EquippedIcon")
+	-- Получаем все доступные иконки предметов
+	local allItemIcons = table.clone(self.amuletsList)
+	-- Можно добавить и другие списки предметов, если нужно
+
+	for _, slotEntity in ipairs(self.equipmentSlots) do
+		local slotName = slotEntity:getName()
+		local slotButton = slotEntity.slotButton
+		local equippedIcon = slotButton and slotButton:FindFirstChild("EquippedIcon")
 		local equippedItemId = inventoryData.equippedItems[slotName]
 
 		if equippedIcon then
 			if equippedItemId then
-				-- Здесь можно добавить логику для получения иконки предмета
-				equippedIcon.Image = "rbxassetid://0" -- Заглушка
+				-- Получаем иконку предмета
+				local itemIcon = allItemIcons[equippedItemId] or "rbxassetid://0"
+				equippedIcon.Image = itemIcon
 				slotButton.BackgroundColor3 = Color3.fromRGB(80, 80, 120) -- Выделяем занятые слоты
 			else
 				equippedIcon.Image = ""
