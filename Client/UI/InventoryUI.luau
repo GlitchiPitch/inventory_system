@@ -1,5 +1,5 @@
 local Players = game:GetService("Players")
-
+local MetaService = require(game.StarterPlayer.StarterPlayerScripts.MetaService)
 ---@class InventoryUI
 ---@field screenGui ScreenGui
 ---@field mainFrame Frame
@@ -25,7 +25,6 @@ InventoryUI.__index = InventoryUI
 ---@param ItemEntity ItemEntity
 ---@return InventoryUI
 function InventoryUI.new(inventoryClientService, amuletsList, fruitsList, EquipmentSlotEntity, ItemEntity)
-	print("Creating InventoryUI...")
 	local self = setmetatable({}, InventoryUI)
 	self.inventoryClientService = inventoryClientService
 	self.amuletsList = amuletsList
@@ -52,7 +51,6 @@ function InventoryUI.new(inventoryClientService, amuletsList, fruitsList, Equipm
 	self:createUI()
 	self:setupEventHandlers()
 	self:setupEquipmentSlots()
-	print("InventoryUI created successfully")
 	return self
 end
 
@@ -93,8 +91,6 @@ function InventoryUI:setupEquipmentSlots()
 end
 
 function InventoryUI:createSlots(inventoryData)
-	warn(inventoryData)
-
 	-- Очищаем существующие слоты перед созданием новых
 	self:clearSlots()
 
@@ -161,9 +157,7 @@ function InventoryUI:setupEventHandlers()
 end
 
 function InventoryUI:onSlotClicked(slotIndex)
-	print("Slot clicked:", slotIndex)
 	if self.isEquipmentWindowOpen then
-		print("Equipment window is open, ignoring slot click")
 		return
 	end
 
@@ -180,12 +174,10 @@ function InventoryUI:onSlotClicked(slotIndex)
 	local inventoryData = self.inventoryClientService:getInventoryData()
 
 	if not inventoryData then
-		print("No inventory data available")
 		return
 	end
 
 	if not inventoryData.inventorySlots then
-		print("No inventory slots data available")
 		return
 	end
 
@@ -207,20 +199,23 @@ function InventoryUI:onSlotClicked(slotIndex)
 		if isEquipped then
 			-- Предмет уже экипирован, снимаем его
 			self.inventoryClientService:requestUnequipItem(equippedSlotName)
-			print("Attempting to unequip", slotData.id, "from", equippedSlotName)
 		else
 			-- Предмет не экипирован, ищем свободный слот
 			local freeSlot = self:findFreeEquipmentSlot()
 			if freeSlot then
 				-- Отправляем запрос на экипировку
 				self.inventoryClientService:requestEquipItem(slotData.id, freeSlot:getName())
-				print("Attempting to equip", slotData.id, "to", freeSlot:getName())
 			else
 				print("No free equipment slot available for item", slotData.id)
+				MetaService.Self:Fire(
+					"Notification",
+					"Create",
+					"No free equipment slot available for item",
+					5,
+					Color3.new(0.8, 0, 1)
+				)
 			end
 		end
-	else
-		print("No item data found for slot", slotIndex)
 	end
 end
 
@@ -252,7 +247,7 @@ function InventoryUI:onEquipmentSlotClicked(slotName)
 	if self.draggedItem then
 		-- Перетаскивание предмета - экипировать в этот слот
 		self.inventoryClientService:requestEquipItem(self.draggedItem.id, slotName)
-		print("Equipping", self.draggedItem.id, "to", slotName)
+		MetaService.Self:Fire("Notification", "Create", "Equip" .. self.draggedItem.id, 5, Color3.new(0.8, 0, 1))
 		return
 	end
 
@@ -263,14 +258,12 @@ function InventoryUI:onEquipmentSlotClicked(slotName)
 		if equippedItemId then
 			-- Есть предмет в слоте - снимаем его
 			self.inventoryClientService:requestUnequipItem(slotName)
-			print("Unequipping item from", slotName)
+			MetaService.Self:Fire("Notification", "Create", "Unequip" .. equippedItemId, 5, Color3.new(0.8, 0, 1))
 		end
 	end
 end
 
 function InventoryUI:onItemEquipped(itemId)
-	print("Item equipped:", itemId)
-
 	-- Находим UI слот инвентаря с этим предметом и показываем Checkmark
 	for _, slotButton in pairs(self.itemSlots) do
 		local itemNameLabel = slotButton:FindFirstChild("ItemNameLabel")
@@ -288,8 +281,6 @@ function InventoryUI:onItemEquipped(itemId)
 end
 
 function InventoryUI:onItemUnequipped(itemId)
-	print("Item unequipped:", itemId)
-
 	-- Находим UI слот инвентаря с этим предметом и скрываем Checkmark
 	for _, slotButton in pairs(self.itemSlots) do
 		local itemNameLabel = slotButton:FindFirstChild("ItemNameLabel")

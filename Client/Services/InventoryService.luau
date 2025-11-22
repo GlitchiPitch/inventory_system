@@ -18,10 +18,8 @@ function InventoryClientService.new(remoteEventService)
 end
 
 function InventoryClientService:setupEventHandlers()
-	print("Setting up InventoryClientService event handlers")
 	-- Обработчик обновления инвентаря
 	self.remoteEventService:connectToEvent("InventoryUpdated", function(args)
-		warn("InventoryUpdated event received:", args)
 		self._inventoryData = args
 		if self._onInventoryUpdated then
 			self._onInventoryUpdated(self._inventoryData)
@@ -30,27 +28,22 @@ function InventoryClientService:setupEventHandlers()
 
 	-- Обработчик ошибок
 	self.remoteEventService:connectToEvent("Error", function(args)
-		warn("Inventory error:", args.message)
 	end)
 
 	-- Обработчик успешного добавления предмета
 	self.remoteEventService:connectToEvent("ItemAdded", function(args)
-		print("Item added:", args.itemId, "count:", args.count)
 	end)
 
 	-- Обработчик успешного удаления предмета
 	self.remoteEventService:connectToEvent("ItemRemoved", function(args)
-		print("Item removed:", args.itemId, "count:", args.count)
 	end)
 
 	-- Обработчик успешной экипировки
 	self.remoteEventService:connectToEvent("ItemEquipped", function(args)
-		print("Item equipped:", args.itemId, "slot:", args.slotName)
 	end)
 
 	-- Обработчик успешного снятия экипировки
 	self.remoteEventService:connectToEvent("ItemUnequipped", function(args)
-		print("Item unequipped from slot:", args.slotName)
 	end)
 end
 
@@ -61,7 +54,6 @@ end
 
 --- Запросить инвентарь с сервера
 function InventoryClientService:requestInventory()
-	print("Requesting inventory from server")
 	self.remoteEventService:fireServer("GetInventory", {})
 end
 

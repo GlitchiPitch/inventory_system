@@ -48,8 +48,6 @@ function Client:init()
 	self.shared:init()
 	self.diContainer:resolve("InventoryClientService")
 	self.diContainer:resolve("InventoryUI")
-
-	print("InventorySystemClient initialized")
 end
 
 ---@return InventoryClientService

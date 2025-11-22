@@ -18,11 +18,9 @@ end
 
 function InventoryRemoteService:init()
     -- Явная инициализация сервиса (если нужно)
-    print("InventoryRemoteService initialized")
 end
 
 function InventoryRemoteService:setupEventHandlers()
-    print("Setting up InventoryRemoteService event handlers")
     -- Получение инвентаря
     self.remoteEventService:connectToEvent("GetInventory", function(player, _args)
         self:handleGetInventory(player)
@@ -52,17 +50,13 @@ end
 ---@param player Player
 function InventoryRemoteService:handleGetInventory(player)
     local userId = tostring(player.UserId)
-    warn("Server: Handling GetInventory request for player", userId)
 
     local inventory = self.inventoryService:getPlayerInventory(userId)
-    print("Server: Retrieved inventory for player", userId, ":", inventory)
 
     if inventory then
         local inventoryData = inventory:toDataStructure()
-        print("Server: Sending inventory data to client:", inventoryData)
         self.remoteEventService:fireClient(player, "InventoryUpdated", inventoryData)
     else
-        print("Server: Failed to load inventory for player", userId)
         self.remoteEventService:fireClient(player, "Error", {message = "Failed to load inventory"})
     end
 end

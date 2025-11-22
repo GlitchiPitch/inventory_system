@@ -15,7 +15,6 @@ function Server.new()
 end
 
 function Server:init()
-	print("InventorySystemServer initialized")
 	self.shared:init()
 	-- Инициализация репозиториев
 	self.repositories:init()

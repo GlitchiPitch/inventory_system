@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.6] - 2025-11-22
+
+### Changed
+- **Code Cleanup**: Removed debug print/warn statements from all services and repositories
+- **User Notifications**: Added MetaService notifications for equipment operations
+- **UI Feedback**: Enhanced user feedback when attempting to equip items without free slots
+
+### Fixed
+- **Notification System**: Integrated proper notification handling for equip/unequip actions
+
+### Technical Details
+- **Logging**: Cleaned up excessive logging across InventoryRepository, InventoryRemoteService, and UI components
+- **User Experience**: Added real-time notifications for equipment operations via MetaService
+
+### Next Steps
+- Implement drag-and-drop inventory interface
+- Add item rarity colors and visual effects
+- Create comprehensive item tooltips system
+
 ## [0.0.5] - 2025-11-22
 
 ### Fixed

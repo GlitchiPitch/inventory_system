@@ -31,7 +31,6 @@ end
 ---@param itemId string
 ---@return number
 function InventoryEntity:getItemCount(itemId)
-	warn(self.inventorySlots)
 	for slotName, slot in pairs(self.inventorySlots) do
 		if slotName == itemId then
 			return slot.count

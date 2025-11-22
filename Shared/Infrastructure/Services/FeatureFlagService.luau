@@ -33,7 +33,6 @@ end
 ---@param enabled boolean
 function FeatureFlagService:setFlag(flagName, enabled)
 	if not self._isServer then
-		warn("[FeatureFlagService] Только сервер может изменять флаги")
 		return
 	end
 
@@ -50,7 +49,6 @@ end
 ---@param flagName string
 function FeatureFlagService:resetFlag(flagName)
 	if not self._isServer then
-		warn("[FeatureFlagService] Только сервер может сбрасывать флаги")
 		return
 	end
 
