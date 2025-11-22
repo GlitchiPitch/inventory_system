@@ -24,26 +24,41 @@ InventoryUI.__index = InventoryUI
 ---@param inventoryClientService InventoryClientService
 ---@param amuletsList AmuletsList
 ---@param fruitsList FruitsList
+---@param ringsList RingsList
+---@param bonusIcons table
 ---@param EquipmentSlotEntity EquipmentSlotEntity
 ---@param ItemEntity ItemEntity
 ---@return InventoryUI
-function InventoryUI.new(inventoryClientService, amuletsList, fruitsList, ringsList, EquipmentSlotEntity, ItemEntity)
+function InventoryUI.new(inventoryClientService, amuletsList, fruitsList, ringsList, bonusIcons, EquipmentSlotEntity, ItemEntity)
 	local self = setmetatable({}, InventoryUI)
 	self.inventoryClientService = inventoryClientService
 	self.amuletsList = amuletsList
 	self.fruitsList = fruitsList
 	self.ringsList = ringsList
+	self.bonusIcons = bonusIcons
 	-- Объединяем списки предметов в один словарь
 	self.allItemIcons = {}
-	for itemName, iconId in pairs(amuletsList) do
-		self.allItemIcons[itemName] = iconId
+	self.allItemBonuses = {}
+	for itemName, itemData in pairs(amuletsList) do
+		self.allItemIcons[itemName] = itemData.icon
+		self.allItemBonuses[itemName] = {
+			bonusType = itemData.bonusType,
+			bonusValue = itemData.bonusValue
+		}
 	end
-	for itemName, iconId in pairs(fruitsList) do
-		self.allItemIcons[itemName] = iconId
+	for itemName, itemData in pairs(fruitsList) do
+		self.allItemIcons[itemName] = itemData.icon
+		self.allItemBonuses[itemName] = {
+			bonusType = itemData.bonusType,
+			bonusValue = itemData.bonusValue
+		}
 	end
-
-	for itemName, iconId in pairs(ringsList) do
-		self.allItemIcons[itemName] = iconId
+	for itemName, itemData in pairs(ringsList) do
+		self.allItemIcons[itemName] = itemData.icon
+		self.allItemBonuses[itemName] = {
+			bonusType = itemData.bonusType,
+			bonusValue = itemData.bonusValue
+		}
 	end
 
 	self.selectedItem = nil
@@ -172,6 +187,22 @@ function InventoryUI:createSlots(inventoryData)
 			checkmark.Visible = isEquipped
 		end
 
+		-- Устанавливаем иконку и значение бонуса
+		local bonusData = self.allItemBonuses[slotName]
+		if bonusData then
+			local bonusIconLabel = slot:FindFirstChild("BonusIconLabel")
+			if bonusIconLabel then
+				local bonusIcon = self.bonusIcons[bonusData.bonusType]
+				if bonusIcon then
+					bonusIconLabel.Image = bonusIcon
+					local bonusValueLabel = bonusIconLabel:FindFirstChild("BonusValueLabel")
+					if bonusValueLabel then
+						bonusValueLabel.Text = "+" .. tostring(bonusData.bonusValue * 100) .. "%"
+					end
+				end
+			end
+		end
+
 		slot.MouseButton1Click:Connect(function()
 			self:onSlotClicked(slotName) -- Передаем имя слота
 		end)
@@ -199,7 +230,7 @@ function InventoryUI:setupEventHandlers()
 	end)
 
 	-- Обработчик успешной экипировки
-	self.inventoryClientService:setOnItemEquipped(function(itemId, slotName)
+	self.inventoryClientService:setOnItemEquipped(function(itemId)
 		self:onItemEquipped(itemId)
 	end)
 
@@ -373,14 +404,12 @@ end
 
 function InventoryUI:onItemEquipped(itemId)
 	-- Находим UI слот инвентаря с этим предметом и показываем Checkmark
-	local foundSlot = false
-	for slotName, slotButton in pairs(self.itemSlots) do
+	for _, slotButton in pairs(self.itemSlots) do
 		local itemNameLabel = slotButton:FindFirstChild("ItemNameLabel")
 		if itemNameLabel and itemNameLabel.Text == itemId then
 			local checkmark = slotButton:FindFirstChild("Checkmark")
 			if checkmark then
 				checkmark.Visible = true
-				foundSlot = true
 			end
 			break
 		end

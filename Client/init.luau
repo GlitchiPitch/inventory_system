@@ -5,6 +5,8 @@ local InventoryUI = require(script.UI.InventoryUI)
 local InventoryService = require(script.Services.InventoryService)
 
 local MetaService = require(game.StarterPlayer.StarterPlayerScripts.MetaService)
+
+
 ---@class InventorySystemClient
 ---@field shared InventorySystemShared
 ---@field diContainer DIContainer
@@ -45,8 +47,9 @@ function Client:_registerServices()
 		local amuletsList = data.AmuletsList
 		local fruitsList = data.FruitsList
 		local ringsList = data.RingsList
+		local bonusIcons = data.BonusIcons
 
-		return InventoryUI.new(inventoryClientService, amuletsList, fruitsList, ringsList, EquipmentSlotEntity, ItemEntity)
+		return InventoryUI.new(inventoryClientService, amuletsList, fruitsList, ringsList, bonusIcons, EquipmentSlotEntity, ItemEntity)
 	end)
 end
 

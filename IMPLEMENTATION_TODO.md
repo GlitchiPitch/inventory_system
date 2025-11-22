@@ -10,6 +10,7 @@
 - ✅ **Basic Equipment Logic**: Server-side equip/unequip validation implemented
 - ✅ **Fruits System**: 20 different fruits with asset IDs implemented
 - ✅ **Network Synchronization**: Complete remote event system for inventory operations
+- ✅ **Item Bonus Display**: Basic bonus icons and values display in inventory slots
 
 ## Next Development Phase (v0.0.9)
 
@@ -19,7 +20,7 @@
 - [ ] **Diablo-style Interface**: Create drag-and-drop inventory UI with 5x5 grid layout
 - [ ] **Grid Layout**: 5x5 inventory grid implementation with proper slot positioning
 - [ ] **Drag-and-Drop Logic**: Implement mouse-based item movement between inventory and equipment
-- [ ] **Item Display**: Show item icons, rarity colors, and basic tooltips
+- [x] **Item Display**: Show item icons, rarity colors, and basic tooltips (bonus display implemented)
 - [ ] **UI State Management**: Real-time synchronization with server inventory state
 - [ ] **Visual Feedback**: Enhanced drag-and-drop visual cues and animations
 
@@ -51,10 +52,11 @@
 - [x] **Rings System**: Added ring equipment system with elemental rings (Lightning Orb, Shadow Gem, Wind Feather)
 - [x] **Inventory Capacity**: 50-slot inventory limit with full/empty state tracking and validation
 - [x] **New Item Types**: RING and AMULET types with equipment compatibility and slot restrictions
+- [x] **Item Bonus Display**: Basic bonus icons and values in inventory slots
 - [ ] **Item Stacking**: Support for stackable items (potions, materials)
 - [ ] **Item Filtering**: Sort and filter inventory items
 - [ ] **Equipment Sets**: Bonus effects for complete equipment sets
-- [ ] **Item Tooltips**: Detailed item information display
+- [ ] **Item Tooltips**: Detailed item information display (basic bonus display implemented)
 
 ## Technical Debt
 - [x] **Code Cleanup**: Removed debug print/warn statements from services and repositories

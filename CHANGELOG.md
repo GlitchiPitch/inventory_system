@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.9] - 2025-11-22
+
+### Added
+- **Item Bonus Display**: Added bonus icons and values display in inventory slots
+- **BonusIcons Table**: Created centralized bonus icons mapping (Energy, Damage, Gems)
+- **Bonus UI Elements**: ImageLabel (BonusIconLabel) and TextLabel (BonusValueLabel) in inventory slots
+
+### Changed
+- **Item Data Structure**: Enhanced AmuletsList, FruitsList, RingsList with bonusType and bonusValue fields
+- **Inventory UI**: Updated slot rendering to display item bonuses with proper formatting (+100%)
+- **UI Architecture**: Extended InventoryUI constructor to accept bonus icons mapping
+
+### Technical Details
+- **Bonus Display Logic**: BonusIconLabel shows icon from BonusIcons using bonusType key
+- **Value Formatting**: BonusValueLabel displays bonusValue * 100 with "+" prefix and "%" suffix
+- **Data Integration**: Connected item bonus data with UI display components
+
+### Next Steps
+- Complete drag-and-drop inventory UI implementation
+- Add item rarity colors and visual effects
+- Implement comprehensive item tooltips with stats
+- Create inventory filtering and search system
+
 ## [0.0.8] - 2025-11-22
 
 ### Added
