@@ -7,12 +7,24 @@ InventoryService.__index = InventoryService
 
 ---@param inventoryRepository InventoryRepository
 ---@param amuletsList table<string, string>
+---@param fruitsList table<string, string>
 ---@param EquipmentSlot EquipmentSlotEntity?
 ---@return InventoryService
-function InventoryService.new(inventoryRepository, amuletsList, EquipmentSlot)
+function InventoryService.new(inventoryRepository, amuletsList, fruitsList, EquipmentSlot)
     local self = setmetatable({}, InventoryService)
     self.inventoryRepository = inventoryRepository
     self.amuletsList = amuletsList or {}
+    self.fruitsList = fruitsList or {}
+
+    -- Объединяем списки предметов в один словарь для валидации
+    self.allItemIcons = {}
+    for itemName, iconId in pairs(amuletsList or {}) do
+        self.allItemIcons[itemName] = iconId
+    end
+    for itemName, iconId in pairs(fruitsList or {}) do
+        self.allItemIcons[itemName] = iconId
+    end
+
     self.EquipmentSlot = EquipmentSlot
     return self
 end
@@ -35,8 +47,8 @@ function InventoryService:addItem(userId, itemId, count)
         return false, "Invalid item count"
     end
 
-    -- Валидация предмета - проверить что он существует в списке амулетов
-    if not self.amuletsList[itemId] then
+    -- Валидация предмета - проверить что он существует в списке предметов
+    if not self.allItemIcons[itemId] then
         return false, "Unknown item"
     end
 
@@ -97,7 +109,7 @@ function InventoryService:equipItem(userId, itemId, slotName)
     end
 
     -- Валидация предмета - проверить что он существует и может быть экипирован
-    if not self.amuletsList[itemId] then
+    if not self.allItemIcons[itemId] then
         return false, "Unknown item"
     end
 
@@ -134,12 +146,12 @@ function InventoryService:unequipItem(userId, slotName)
         return false, "No item equipped in this slot"
     end
 
-    local success = self.inventoryRepository:unequipItem(userId, slot)
+    local success, unequippedItem = self.inventoryRepository:unequipItem(userId, slot)
     if not success then
         return false, "Failed to unequip item"
     end
 
-    return true, nil
+    return true, unequippedItem
 end
 
 ---@param userId string

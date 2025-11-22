@@ -41,7 +41,7 @@ function InventoryRepository:getByPlayerId(userId)
 		return nil
 	end
 
-    warn(metaPlayer)
+	warn(metaPlayer)
 
 	-- Получить данные инвентаря
 	local inventoryData = metaPlayer.Data.Inventory
@@ -55,9 +55,18 @@ function InventoryRepository:getByPlayerId(userId)
 	local amuletsData = inventoryData["Amulets"] or {}
 	local inventorySlots = {}
 	for name, count in pairs(amuletsData) do
-		inventorySlots[name]= {
+		inventorySlots[name] = {
 			id = name,
-			count = count
+			count = count,
+		}
+	end
+
+	local fruitsData = inventoryData["Fruits"] or {}
+
+	for name, count in pairs(fruitsData) do
+		inventorySlots[name] = {
+			id = name,
+			count = count,
 		}
 	end
 
@@ -193,7 +202,7 @@ function InventoryRepository:unequipItem(userId, slot)
 		return false
 	end
 
-	local success = inventory:unequipItem(slot)
+	local success, unequippedItem = inventory:unequipItem(slot)
 	if success then
 		self:save(userId, inventory)
 		self.logger:info(
@@ -207,7 +216,7 @@ function InventoryRepository:unequipItem(userId, slot)
 		)
 	end
 
-	return success
+	return success, unequippedItem
 end
 
 ---@param userId string

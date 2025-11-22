@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.5] - 2025-11-22
+
+### Fixed
+- **Equipment Slot Icons**: Fixed rbxassetid:// prefix for equipment slot images to ensure proper loading
+- **Equipment Slot Text**: Added TextTransparency changes for occupied equipment slots (0.5 opacity when filled, 0 when empty)
+
+### Changed
+- **UI Visual Feedback**: Enhanced equipment slot visual states with text transparency changes
+
+### Technical Details
+- **Image Loading**: Consistent rbxassetid:// prefix usage across all UI elements
+- **Slot State Visualization**: Text transparency indicates equipment slot occupation status
+
+### Next Steps
+- Complete drag-and-drop inventory interface implementation
+- Add item rarity colors and visual feedback
+- Implement inventory grid layout and item positioning
+
 ## [0.0.4] - 2025-11-21
 
 ### Added

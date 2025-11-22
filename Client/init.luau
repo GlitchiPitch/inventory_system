@@ -38,15 +38,16 @@ function Client:_registerServices()
 		local EquipmentSlotEntity = domain.entities.EquipmentSlot
 		local ItemEntity = domain.entities.Item
 		local amuletsList = data.AmuletsList
-		
-		return InventoryUI.new(inventoryClientService, amuletsList, EquipmentSlotEntity, ItemEntity)
+		local fruitsList = data.FruitsList
+
+		return InventoryUI.new(inventoryClientService, amuletsList, fruitsList, EquipmentSlotEntity, ItemEntity)
 	end)
 end
 
 function Client:init()
 	self.shared:init()
-	local inventoryClientService = self.diContainer:resolve("InventoryClientService")
-	local inventoryUI = self.diContainer:resolve("InventoryUI")
+	self.diContainer:resolve("InventoryClientService")
+	self.diContainer:resolve("InventoryUI")
 
 	print("InventorySystemClient initialized")
 end

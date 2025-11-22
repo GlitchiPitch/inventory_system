@@ -144,13 +144,13 @@ function InventoryRemoteService:handleUnequipItem(player, args)
         return
     end
 
-    local success, errorMessage = self.inventoryService:unequipItem(userId, slotName)
+    local success, unequippedItem = self.inventoryService:unequipItem(userId, slotName)
     if success then
-        self.remoteEventService:fireClient(player, "ItemUnequipped", {slotName = slotName})
+        self.remoteEventService:fireClient(player, "ItemUnequipped", {itemId = unequippedItem})
         -- Отправить обновленный инвентарь
         self:handleGetInventory(player)
     else
-        self.remoteEventService:fireClient(player, "Error", {message = errorMessage or "Failed to unequip item"})
+        self.remoteEventService:fireClient(player, "Error", {message = unequippedItem or "Failed to unequip item"})
     end
 end
 

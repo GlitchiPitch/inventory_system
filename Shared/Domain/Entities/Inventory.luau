@@ -126,7 +126,7 @@ function InventoryEntity:unequipItem(slot)
 		self:addItem(equippedItem, 1)
 	end
 
-	return true
+	return true, equippedItem
 end
 
 ---@return table
