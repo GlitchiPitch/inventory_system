@@ -11,7 +11,17 @@
 - ✅ **Fruits System**: 20 different fruits with asset IDs implemented
 - ✅ **Network Synchronization**: Complete remote event system for inventory operations
 
-## Next Development Phase
+## Next Development Phase (v0.0.9)
+
+### Phase 3: Client UI (Priority: High) - IN PROGRESS
+**Target**: Complete drag-and-drop inventory interface for user interaction
+
+- [ ] **Diablo-style Interface**: Create drag-and-drop inventory UI with 5x5 grid layout
+- [ ] **Grid Layout**: 5x5 inventory grid implementation with proper slot positioning
+- [ ] **Drag-and-Drop Logic**: Implement mouse-based item movement between inventory and equipment
+- [ ] **Item Display**: Show item icons, rarity colors, and basic tooltips
+- [ ] **UI State Management**: Real-time synchronization with server inventory state
+- [ ] **Visual Feedback**: Enhanced drag-and-drop visual cues and animations
 
 ### Phase 2: Server Inventory Logic (Priority: High) - COMPLETED
 - [x] **InventoryRepository**: Enhanced repository with data structure transformation and persistence
@@ -20,13 +30,15 @@
 - [x] **PlayerRepository Enhancement**: Add inventory management methods
 - [x] **Server Validation**: Advanced business rules validation on server side
 
-### Phase 3: Client UI (Priority: High)
-- [ ] **Diablo-style Interface**: Create drag-and-drop inventory UI
-- [ ] **Grid Layout**: 5x5 or 6x6 inventory grid implementation
+### Phase 3: Client UI (Priority: High) - IN PROGRESS
+- [ ] **Diablo-style Interface**: Create drag-and-drop inventory UI with 5x5 grid layout
+- [ ] **Grid Layout**: 5x5 inventory grid implementation with slot positioning
 - [x] **Equipment Panel**: Three dedicated equipment slots (leftHand, rightHand, helmet) with visual feedback
 - [x] **Visual Feedback**: Highlight valid/invalid actions and slots, text transparency for occupied slots
 - [x] **User Notifications**: Added MetaService notifications for equipment operations and error states
-- [ ] **Item Display**: Show item icons, rarity, and tooltips
+- [ ] **Item Display**: Show item icons, rarity colors, and basic tooltips
+- [ ] **Drag-and-Drop Logic**: Implement mouse-based item movement between inventory and equipment
+- [ ] **UI State Management**: Real-time synchronization with server inventory state
 
 ### Phase 4: Network Synchronization (Priority: Medium) - PARTIALLY COMPLETED
 - [x] **Remote Events**: Client-server communication for inventory actions
@@ -35,10 +47,10 @@
 - [x] **Error Handling**: Network error recovery and user feedback
 - [ ] **Performance**: Optimize network traffic and update frequency
 
-### Phase 5: Advanced Features (Priority: Low)
-- [x] **Rings System**: Added ring equipment system with elemental rings
-- [x] **Inventory Capacity**: 50-slot inventory limit with full/empty state tracking
-- [x] **New Item Types**: RING and AMULET types with equipment compatibility
+### Phase 5: Advanced Features (Priority: Low) - PARTIALLY COMPLETED
+- [x] **Rings System**: Added ring equipment system with elemental rings (Lightning Orb, Shadow Gem, Wind Feather)
+- [x] **Inventory Capacity**: 50-slot inventory limit with full/empty state tracking and validation
+- [x] **New Item Types**: RING and AMULET types with equipment compatibility and slot restrictions
 - [ ] **Item Stacking**: Support for stackable items (potions, materials)
 - [ ] **Item Filtering**: Sort and filter inventory items
 - [ ] **Equipment Sets**: Bonus effects for complete equipment sets

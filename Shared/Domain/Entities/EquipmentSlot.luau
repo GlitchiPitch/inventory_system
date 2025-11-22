@@ -86,8 +86,8 @@ end
 ---@return table
 function EquipmentSlotEntity.getAllSlots()
     return {
-        EquipmentSlotEntity.LEFT_HAND,
         EquipmentSlotEntity.RIGHT_HAND,
+        EquipmentSlotEntity.LEFT_HAND,
         EquipmentSlotEntity.HELMET
     }
 end

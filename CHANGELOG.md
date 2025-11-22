@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.8] - 2025-11-22
+
+### Added
+- **Equipment Expansion**: Rings can be equipped in left/right hand slots, amulets in helmet slot
+- **New Item Types**: Added RING and AMULET item types to ItemEntity with equipment compatibility
+- **Rings System**: Implemented Lightning Orb, Shadow Gem, Wind Feather rings with asset integration
+- **Amulets System**: Added Earth Stone, Fire Crystal, Ice Shard amulets with elemental properties
+- **Inventory Capacity**: 50-slot inventory limit with full/empty state tracking and validation
+
+### Changed
+- **Equipment Logic**: Updated slot compatibility rules for new item types (weapons/rings in hands, amulets in helmet)
+- **Data Structure**: Enhanced inventory persistence to support equipped rings and amulets
+- **Item Management**: Extended server-side validation for ring and amulet equipment operations
+
+### Technical Details
+- **Equipment Slots**: Expanded allowedItemTypes for LEFT_HAND/RIGHT_HAND ("weapon", "ring") and HELMET ("amulet")
+- **Data Persistence**: Updated InventoryRepository with ring and amulet equipment tracking
+- **Asset Integration**: Connected RingsList and AmuletsList with external SharedModules for icon assets
+
+### Next Steps
+- Complete drag-and-drop inventory UI implementation
+- Add item rarity colors and visual effects
+- Implement comprehensive item tooltips with stats
+- Create inventory filtering and search system
+
 ## [0.0.7] - 2025-11-22
 
 ### Added

@@ -24,7 +24,12 @@ function Client:_registerServices()
 	-- Регистрация InventoryClientService
 	self.diContainer:singleton("InventoryClientService", function(container)
 		local remoteEventService = container:resolve("RemoteEventService")
-		return InventoryService.new(remoteEventService)
+		---@type InventorySystemData
+		local data = container:resolve("Shared.Data")
+		local amuletsList = data.AmuletsList
+		local ringsList = data.RingsList
+		local fruitsList = data.FruitsList
+		return InventoryService.new(remoteEventService, amuletsList, ringsList, fruitsList)
 	end)
 
 	-- Регистрация InventoryUI
@@ -39,8 +44,9 @@ function Client:_registerServices()
 		local ItemEntity = domain.entities.Item
 		local amuletsList = data.AmuletsList
 		local fruitsList = data.FruitsList
+		local ringsList = data.RingsList
 
-		return InventoryUI.new(inventoryClientService, amuletsList, fruitsList, EquipmentSlotEntity, ItemEntity)
+		return InventoryUI.new(inventoryClientService, amuletsList, fruitsList, ringsList, EquipmentSlotEntity, ItemEntity)
 	end)
 end
 

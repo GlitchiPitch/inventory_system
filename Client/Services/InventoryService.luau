@@ -2,17 +2,21 @@
 ---@field remoteEventService RemoteEventService
 ---@field _inventoryData table?
 ---@field _onInventoryUpdated function?
+---@field _onItemEquipped function?
 local InventoryClientService = {}
 InventoryClientService.__index = InventoryClientService
 
 ---@param remoteEventService RemoteEventService
 ---@return InventoryClientService
-function InventoryClientService.new(remoteEventService)
+function InventoryClientService.new(remoteEventService, amuletsList, ringsList, fruitsList)
 	local self = setmetatable({}, InventoryClientService)
 	self.remoteEventService = remoteEventService
 	self._inventoryData = nil
 	self._onInventoryUpdated = nil
-
+	self._onItemEquipped = nil
+	self._amuletsList = amuletsList
+	self._ringsList = ringsList
+	self._fruitsList = fruitsList
 	self:setupEventHandlers()
 	return self
 end
@@ -27,23 +31,26 @@ function InventoryClientService:setupEventHandlers()
 	end)
 
 	-- Обработчик ошибок
-	self.remoteEventService:connectToEvent("Error", function(args)
+	self.remoteEventService:connectToEvent("Error", function(_args)
 	end)
 
 	-- Обработчик успешного добавления предмета
-	self.remoteEventService:connectToEvent("ItemAdded", function(args)
+	self.remoteEventService:connectToEvent("ItemAdded", function(_args)
 	end)
 
 	-- Обработчик успешного удаления предмета
-	self.remoteEventService:connectToEvent("ItemRemoved", function(args)
+	self.remoteEventService:connectToEvent("ItemRemoved", function(_args)
 	end)
 
 	-- Обработчик успешной экипировки
 	self.remoteEventService:connectToEvent("ItemEquipped", function(args)
+		if self._onItemEquipped then
+			self._onItemEquipped(args.itemId, args.slotName)
+		end
 	end)
 
 	-- Обработчик успешного снятия экипировки
-	self.remoteEventService:connectToEvent("ItemUnequipped", function(args)
+	self.remoteEventService:connectToEvent("ItemUnequipped", function(_args)
 	end)
 end
 
@@ -142,6 +149,25 @@ end
 
 function InventoryClientService:setOnInventoryUpdated(callback)
 	self._onInventoryUpdated = callback
+end
+
+---@param callback function(itemId: string, slotName: string)
+function InventoryClientService:setOnItemEquipped(callback)
+	self._onItemEquipped = callback
+end
+
+---@param itemId string
+---@return string
+function InventoryClientService:getItemType(itemId)
+	if self._amuletsList[itemId] then
+		return "amulet"
+	elseif self._ringsList[itemId] then
+		return "ring"
+	elseif self._fruitsList[itemId] then
+		return "weapon" -- фрукты считаем оружием
+	end
+
+	return "weapon" -- по умолчанию
 end
 
 return InventoryClientService

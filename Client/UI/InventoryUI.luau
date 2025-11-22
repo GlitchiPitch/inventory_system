@@ -27,18 +27,22 @@ InventoryUI.__index = InventoryUI
 ---@param EquipmentSlotEntity EquipmentSlotEntity
 ---@param ItemEntity ItemEntity
 ---@return InventoryUI
-function InventoryUI.new(inventoryClientService, amuletsList, fruitsList, EquipmentSlotEntity, ItemEntity)
+function InventoryUI.new(inventoryClientService, amuletsList, fruitsList, ringsList, EquipmentSlotEntity, ItemEntity)
 	local self = setmetatable({}, InventoryUI)
 	self.inventoryClientService = inventoryClientService
 	self.amuletsList = amuletsList
 	self.fruitsList = fruitsList
-
+	self.ringsList = ringsList
 	-- Объединяем списки предметов в один словарь
 	self.allItemIcons = {}
 	for itemName, iconId in pairs(amuletsList) do
 		self.allItemIcons[itemName] = iconId
 	end
 	for itemName, iconId in pairs(fruitsList) do
+		self.allItemIcons[itemName] = iconId
+	end
+
+	for itemName, iconId in pairs(ringsList) do
 		self.allItemIcons[itemName] = iconId
 	end
 
@@ -68,7 +72,7 @@ function InventoryUI:createUI()
 	self.slotTemplate = self.mainFrame.ScrollingFrame.Template
 
 	-- Найти кнопку режима удаления
-	self.deleteModeButton = self.mainFrame:FindFirstChild("DeleteModeButton")
+	self.deleteModeButton = self.equipmentFrame:FindFirstChild("DeleteModeButton")
 	if self.deleteModeButton then
 		self.deleteModeButton.MouseButton1Click:Connect(function()
 			self:toggleDeleteMode()
@@ -80,6 +84,8 @@ function InventoryUI:createUI()
 	self.slotsInfoLabel = self.mainFrame:FindFirstChild("SlotsInfoLabel")
 
 	self.mainFrame:GetPropertyChangedSignal("Visible"):Connect(function()
+		self.isDeleteMode = false
+		self:updateDeleteModeButton()
 		if self.mainFrame.Visible then
 			self.inventoryClientService:requestInventory()
 		else
@@ -106,25 +112,17 @@ function InventoryUI:toggleDeleteMode()
 			Color3.new(1, 0.5, 0)
 		)
 	else
-		MetaService.Self:Fire(
-			"Notification",
-			"Create",
-			"Delete mode disabled",
-			3,
-			Color3.new(0, 1, 0)
-		)
+		MetaService.Self:Fire("Notification", "Create", "Delete mode disabled", 3, Color3.new(0, 1, 0))
 	end
 end
 
 function InventoryUI:updateDeleteModeButton()
-	if not self.deleteModeButton then return end
-
 	if self.isDeleteMode then
-		self.deleteModeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50) -- Красный для режима удаления
-		self.deleteModeButton.Text = "Exit Delete Mode"
+		self.deleteModeButton.ImageLabel.ImageTransparency = 0
+		self.deleteModeButton.TextLabel.Visible = true
 	else
-		self.deleteModeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- Серый для обычного режима
-		self.deleteModeButton.Text = "Delete Mode"
+		self.deleteModeButton.ImageLabel.ImageTransparency = 0.5
+		self.deleteModeButton.TextLabel.Visible = false
 	end
 end
 
@@ -155,7 +153,7 @@ function InventoryUI:createSlots(inventoryData)
 		slot.CountLabel.Text = slotData.count
 		slot.Parent = self.inventoryFrame
 		slot.ItemNameLabel.Text = slotName
-		slot.ItemIcon.Image = `rbxassetid://{self.allItemIcons[slotName] or 0}`
+		slot.ItemIcon.Image = self.allItemIcons[slotName] or ""
 		slot.Visible = true
 
 		-- Проверяем, экипирован ли предмет, и показываем Checkmark
@@ -175,12 +173,12 @@ function InventoryUI:createSlots(inventoryData)
 		end
 
 		slot.MouseButton1Click:Connect(function()
-			self:onSlotClicked(slotName) -- Передаем индекс вместо имени
+			self:onSlotClicked(slotName) -- Передаем имя слота
 		end)
 
 		local item = self.ItemEntity.new(slotName, slotName, "weapon", slot)
 		table.insert(self.inventorySlots, item)
-		table.insert(self.itemSlots, slot) -- Добавляем UI слот в массив
+		self.itemSlots[slotName] = slot -- Сохраняем UI слот по имени предмета
 	end
 end
 
@@ -201,12 +199,12 @@ function InventoryUI:setupEventHandlers()
 	end)
 
 	-- Обработчик успешной экипировки
-	local remoteEventService = self.inventoryClientService.remoteEventService
-	remoteEventService:connectToEvent("ItemEquipped", function(args)
-		self:onItemEquipped(args.itemId)
+	self.inventoryClientService:setOnItemEquipped(function(itemId, slotName)
+		self:onItemEquipped(itemId)
 	end)
 
 	-- Обработчик снятия экипировки
+	local remoteEventService = self.inventoryClientService.remoteEventService
 	remoteEventService:connectToEvent("ItemUnequipped", function(args)
 		self:onItemUnequipped(args.itemId)
 	end)
@@ -218,7 +216,6 @@ function InventoryUI:onSlotClicked(slotIndex)
 	end
 
 	local inventoryData = self.inventoryClientService:getInventoryData()
-
 	if not inventoryData then
 		return
 	end
@@ -228,6 +225,9 @@ function InventoryUI:onSlotClicked(slotIndex)
 	end
 
 	local slotData = inventoryData.inventorySlots[slotIndex]
+	if not slotData then
+		return
+	end
 	if slotData then
 		if self.isDeleteMode then
 			-- Режим удаления - удаляем предмет
@@ -262,12 +262,12 @@ function InventoryUI:onSlotClicked(slotIndex)
 				self.inventoryClientService:requestUnequipItem(equippedSlotName)
 			else
 				-- Предмет не экипирован, ищем свободный слот
-				local freeSlot = self:findFreeEquipmentSlot()
+				local itemType = self.inventoryClientService:getItemType(slotData.id)
+				local freeSlot = self:findFreeEquipmentSlot(itemType)
 				if freeSlot then
 					-- Отправляем запрос на экипировку
 					self.inventoryClientService:requestEquipItem(slotData.id, freeSlot:getName())
 				else
-					print("No free equipment slot available for item", slotData.id)
 					MetaService.Self:Fire(
 						"Notification",
 						"Create",
@@ -282,37 +282,68 @@ function InventoryUI:onSlotClicked(slotIndex)
 end
 
 function InventoryUI:deleteItem(itemId, count)
-	if count <= 0 then return end
+	if count <= 0 then
+		return
+	end
+
+	-- Проверяем, экипирован ли предмет
+	local inventoryData = self.inventoryClientService:getInventoryData()
+	if inventoryData and inventoryData.equippedItems then
+		for _, equippedItemId in pairs(inventoryData.equippedItems) do
+			if equippedItemId == itemId then
+				-- Предмет экипирован, нельзя удалить
+				MetaService.Self:Fire("Notification", "Create", "Cannot delete equipped item", 3, Color3.new(1, 0, 0))
+				return
+			end
+		end
+	end
 
 	-- Отправляем запрос на удаление предмета
 	self.inventoryClientService:requestRemoveItem(itemId, count)
 
-	MetaService.Self:Fire(
-		"Notification",
-		"Create",
-		`Removed {count}x {itemId}`,
-		3,
-		Color3.new(1, 0.5, 0)
-	)
+	MetaService.Self:Fire("Notification", "Create", `Removed {count}x {itemId}`, 3, Color3.new(1, 0.5, 0))
 end
 
-function InventoryUI:findFreeEquipmentSlot() -- itemId зарезервировано для будущей логики определения типа предмета
+function InventoryUI:findFreeEquipmentSlot(itemType)
 	local inventoryData = self.inventoryClientService:getInventoryData()
 	if not inventoryData or not inventoryData.equippedItems then
 		return nil
 	end
 
-	-- Получаем все доступные слоты экипировки
-	local allSlots = self.EquipmentSlotEntity.getAllSlots()
+	-- Специальная логика выбора слота в зависимости от типа предмета
+	if itemType == "ring" then
+		-- Кольца экипируются в правую руку в первую очередь
+		local rightHandSlot = self.EquipmentSlotEntity.RIGHT_HAND
+		if not inventoryData.equippedItems[rightHandSlot:getName()] and rightHandSlot:canEquipItemType(itemType) then
+			return rightHandSlot
+		end
+		-- Если правая рука занята, пробуем левую
+		local leftHandSlot = self.EquipmentSlotEntity.LEFT_HAND
+		if not inventoryData.equippedItems[leftHandSlot:getName()] and leftHandSlot:canEquipItemType(itemType) then
+			return leftHandSlot
+		end
+	elseif itemType == "weapon" then
+		-- Оружие экипируется в левую руку в первую очередь
+		local leftHandSlot = self.EquipmentSlotEntity.LEFT_HAND
+		if not inventoryData.equippedItems[leftHandSlot:getName()] and leftHandSlot:canEquipItemType(itemType) then
+			return leftHandSlot
+		end
+		-- Если левая рука занята, пробуем правую
+		local rightHandSlot = self.EquipmentSlotEntity.RIGHT_HAND
+		if not inventoryData.equippedItems[rightHandSlot:getName()] and rightHandSlot:canEquipItemType(itemType) then
+			return rightHandSlot
+		end
+	else
+		-- Для других типов предметов (amulet) используем стандартную логику
+		local allSlots = self.EquipmentSlotEntity.getAllSlots()
 
-	-- Ищем первый свободный слот, совместимый с типом предмета
-	for _, slot in ipairs(allSlots) do
-		local slotName = slot:getName()
-		if not inventoryData.equippedItems[slotName] then
-			-- Для базовой логики считаем, что все предметы типа "weapon"
-			-- и совместимы со всеми слотами
-			if slot:canEquipItemType("weapon") then
-				return slot
+		-- Ищем первый свободный слот, совместимый с типом предмета
+		for _, slot in ipairs(allSlots) do
+			local slotName = slot:getName()
+			if not inventoryData.equippedItems[slotName] then
+				if slot:canEquipItemType(itemType) then
+					return slot
+				end
 			end
 		end
 	end
@@ -342,12 +373,14 @@ end
 
 function InventoryUI:onItemEquipped(itemId)
 	-- Находим UI слот инвентаря с этим предметом и показываем Checkmark
-	for _, slotButton in pairs(self.itemSlots) do
+	local foundSlot = false
+	for slotName, slotButton in pairs(self.itemSlots) do
 		local itemNameLabel = slotButton:FindFirstChild("ItemNameLabel")
 		if itemNameLabel and itemNameLabel.Text == itemId then
 			local checkmark = slotButton:FindFirstChild("Checkmark")
 			if checkmark then
 				checkmark.Visible = true
+				foundSlot = true
 			end
 			break
 		end
@@ -393,7 +426,7 @@ function InventoryUI:updateEquipmentSlots()
 			if equippedItemId then
 				-- Получаем иконку предмета
 				local itemIconId = allItemIcons[equippedItemId] or "0"
-				equippedIcon.Image = `rbxassetid://{itemIconId}`
+				equippedIcon.Image = itemIconId or ""
 				slotButton.BackgroundColor3 = Color3.fromRGB(80, 80, 120) -- Выделяем занятые слоты
 				slotButton.TextTransparency = 1 -- Полупрозрачный текст для занятых слотов
 			else
@@ -406,7 +439,9 @@ function InventoryUI:updateEquipmentSlots()
 end
 
 function InventoryUI:updateSlotsInfoLabel()
-	if not self.slotsInfoLabel then return end
+	if not self.slotsInfoLabel then
+		return
+	end
 
 	local inventoryData = self.inventoryClientService:getInventoryData()
 	if not inventoryData or not inventoryData.inventorySlots then

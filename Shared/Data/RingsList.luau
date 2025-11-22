@@ -1,8 +1,12 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SharedModules = ReplicatedStorage.SharedModules
+local RingsModule = require(SharedModules.Rings)
+
 ---@class RingsList
 local RingsList = {
-    ["Lightning Orb"] =  "5",
-    ["Shadow Gem"] =  "6",
-    ["Wind Feather"] =  "7",
+    ["Lightning Orb"] =  RingsModule["Lightning Orb"].Icon,
+    ["Shadow Gem"] =  RingsModule["Shadow Gem"].Icon,
+    ["Wind Feather"] =  RingsModule["Wind Feather"].Icon,
 }
 
 return RingsList

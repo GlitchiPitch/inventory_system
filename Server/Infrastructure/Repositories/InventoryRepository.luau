@@ -116,6 +116,18 @@ function InventoryRepository:getByPlayerId(userId)
 		inventorySlots = inventorySlots,
 	})
 
+	-- Инициализируем массив EquippedRings если его нет
+	if not metaPlayer.Data.Inventory.EquippedRings then
+		metaPlayer.Data.Inventory.EquippedRings = {}
+		self.logger:info("InventoryRepository", string.format("EquippedRings array initialized for player %s", userId))
+	end
+
+	-- Инициализируем массив EquippedAmulets если его нет
+	if not metaPlayer.Data.Inventory.EquippedAmulets then
+		metaPlayer.Data.Inventory.EquippedAmulets = {}
+		self.logger:info("InventoryRepository", string.format("EquippedAmulets array initialized for player %s", userId))
+	end
+
 	-- Добавить в кэш
 	-- self._cache[userId] = inventory
 
@@ -142,7 +154,6 @@ function InventoryRepository:save(userId, inventory)
 	-- Сохранить данные инвентаря
 	local data = inventory:toDataStructure()
 	metaPlayer.Data.Inventory["EquippedAccessories"] = data.equippedItems
-
 	-- Сохранить предметы по категориям
 	-- Гарантируем, что count всегда number
 	local function ensureNumber(value)
@@ -232,6 +243,62 @@ function InventoryRepository:equipItem(userId, itemId, slot)
 	local success = inventory:equipItem(itemId, slot)
 	if success then
 		self:save(userId, inventory)
+
+		-- Дополнительная логика для колец
+		if self:checkIsRing(itemId) then
+			local playerInstance = Players:GetPlayerByUserId(tonumber(userId))
+			if playerInstance then
+				local metaPlayer = MetaService.Class.Player:Get(playerInstance)
+				if metaPlayer then
+					-- Инициализируем массив EquippedRings если его нет
+					if not metaPlayer.Data.Inventory.EquippedRings then
+						metaPlayer.Data.Inventory.EquippedRings = {}
+					end
+
+					-- Добавляем кольцо в массив, если его там нет
+					local alreadyEquipped = false
+					for _, ring in ipairs(metaPlayer.Data.Inventory.EquippedRings) do
+						if ring == itemId then
+							alreadyEquipped = true
+							break
+						end
+					end
+
+					if not alreadyEquipped then
+						table.insert(metaPlayer.Data.Inventory.EquippedRings, itemId)
+						-- self.logger:info("InventoryRepository", string.format("Ring %s equipped for player %s", itemId, userId))
+					end
+				end
+			end
+		end
+
+		-- Дополнительная логика для амулетов
+		if self:checkIsAmulet(itemId) then
+			local playerInstance = Players:GetPlayerByUserId(tonumber(userId))
+			if playerInstance then
+				local metaPlayer = MetaService.Class.Player:Get(playerInstance)
+				if metaPlayer then
+					-- Инициализируем массив EquippedAmulets если его нет
+					if not metaPlayer.Data.Inventory.EquippedAmulets then
+						metaPlayer.Data.Inventory.EquippedAmulets = {}
+					end
+
+					-- Добавляем амулет в массив, если его там нет
+					local alreadyEquipped = false
+					for _, amulet in ipairs(metaPlayer.Data.Inventory.EquippedAmulets) do
+						if amulet == itemId then
+							alreadyEquipped = true
+							break
+						end
+					end
+
+					if not alreadyEquipped then
+						table.insert(metaPlayer.Data.Inventory.EquippedAmulets, itemId)
+						-- self.logger:info("InventoryRepository", string.format("Amulet %s equipped for player %s", itemId, userId))
+					end
+				end
+			end
+		end
 	end
 
 	return success
@@ -249,6 +316,42 @@ function InventoryRepository:unequipItem(userId, slot)
 	local success, unequippedItem = inventory:unequipItem(slot)
 	if success then
 		self:save(userId, inventory)
+
+		-- Дополнительная логика для колец
+		if unequippedItem and self:checkIsRing(unequippedItem) then
+			local playerInstance = Players:GetPlayerByUserId(tonumber(userId))
+			if playerInstance then
+				local metaPlayer = MetaService.Class.Player:Get(playerInstance)
+				if metaPlayer and metaPlayer.Data.Inventory.EquippedRings then
+					-- Удаляем кольцо из массива EquippedRings
+					for i, ring in ipairs(metaPlayer.Data.Inventory.EquippedRings) do
+						if ring == unequippedItem then
+							table.remove(metaPlayer.Data.Inventory.EquippedRings, i)
+							-- self.logger:info("InventoryRepository", string.format("Ring %s unequipped for player %s", unequippedItem, userId))
+							break
+						end
+					end
+				end
+			end
+		end
+
+		-- Дополнительная логика для амулетов
+		if unequippedItem and self:checkIsAmulet(unequippedItem) then
+			local playerInstance = Players:GetPlayerByUserId(tonumber(userId))
+			if playerInstance then
+				local metaPlayer = MetaService.Class.Player:Get(playerInstance)
+				if metaPlayer and metaPlayer.Data.Inventory.EquippedAmulets then
+					-- Удаляем амулет из массива EquippedAmulets
+					for i, amulet in ipairs(metaPlayer.Data.Inventory.EquippedAmulets) do
+						if amulet == unequippedItem then
+							table.remove(metaPlayer.Data.Inventory.EquippedAmulets, i)
+							-- self.logger:info("InventoryRepository", string.format("Amulet %s unequipped for player %s", unequippedItem, userId))
+							break
+						end
+					end
+				end
+			end
+		end
 	end
 
 	return success, unequippedItem

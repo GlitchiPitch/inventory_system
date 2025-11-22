@@ -3,24 +3,30 @@ local MetaService = require(game.ServerScriptService.MetaService)
 ---@class InventoryService
 ---@field inventoryRepository InventoryRepository
 ---@field amuletsList table<string, string>
+---@field ringsList table<string, string>
 ---@field EquipmentSlot EquipmentSlotEntity?
 local InventoryService = {}
 InventoryService.__index = InventoryService
 
 ---@param inventoryRepository InventoryRepository
 ---@param amuletsList table<string, string>
+---@param ringsList table<string, string>
 ---@param fruitsList table<string, string>
 ---@param EquipmentSlot EquipmentSlotEntity?
 ---@return InventoryService
-function InventoryService.new(inventoryRepository, amuletsList, fruitsList, EquipmentSlot)
+function InventoryService.new(inventoryRepository, amuletsList, ringsList, fruitsList, EquipmentSlot)
 	local self = setmetatable({}, InventoryService)
 	self.inventoryRepository = inventoryRepository
 	self.amuletsList = amuletsList or {}
+	self.ringsList = ringsList or {}
 	self.fruitsList = fruitsList or {}
 
 	-- Объединяем списки предметов в один словарь для валидации
 	self.allItemIcons = {}
 	for itemName, iconId in pairs(amuletsList or {}) do
+		self.allItemIcons[itemName] = iconId
+	end
+	for itemName, iconId in pairs(ringsList or {}) do
 		self.allItemIcons[itemName] = iconId
 	end
 	for itemName, iconId in pairs(fruitsList or {}) do
@@ -129,8 +135,9 @@ function InventoryService:equipItem(userId, itemId, slotName)
 		return false, "Fruits cannot be equipped"
 	end
 
-	-- Все амулеты в этой игре считаются "оружием" и могут быть экипированы в соответствующие слоты
-	if not slot:canEquipItemType("weapon") then
+	-- Проверить совместимость слота с типом предмета
+	local itemType = self:getItemType(itemId)
+	if not slot:canEquipItemType(itemType) then
 		return false, "Item cannot be equipped in this slot"
 	end
 
@@ -168,6 +175,20 @@ function InventoryService:unequipItem(userId, slotName)
 	end
 
 	return true, unequippedItem
+end
+
+---@param itemId string
+---@return string
+function InventoryService:getItemType(itemId)
+	if self.amuletsList[itemId] then
+		return "amulet"
+	elseif self.ringsList[itemId] then
+		return "ring"
+	elseif self.fruitsList[itemId] then
+		return "weapon" -- фрукты считаем оружием
+	end
+
+	return "weapon" -- по умолчанию
 end
 
 ---@param userId string
