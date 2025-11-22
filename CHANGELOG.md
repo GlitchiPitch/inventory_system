@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.7] - 2025-11-22
+
+### Added
+- **Rings System**: New RingsList with elemental rings (Lightning Orb, Shadow Gem, Wind Feather)
+- **Inventory Capacity**: Added 50-slot limit for inventory with full/empty state tracking
+- **New Item Types**: Added RING and AMULET item types to ItemEntity
+- **Equipment Expansion**: Rings can now be equipped in left/right hand slots, amulets in helmet slot
+
+### Changed
+- **Inventory Data Structure**: Refactored from array to dictionary format for better performance and item lookup
+- **Amulets Reorganization**: Streamlined amulets list to focus on elemental stones and crystals
+- **Fruits System**: Updated to use external FruitsModule for asset management
+- **Equipment Logic**: Updated slot compatibility rules for new item types
+
+### Technical Details
+- **Data Structure**: Changed inventory slots from `[{id, count}]` array to `{itemId: {id, count}}` dictionary
+- **Performance**: Improved item lookup O(1) vs O(n) for inventory operations
+- **Memory Management**: Better slot tracking and capacity management
+
+### Next Steps
+- Implement drag-and-drop inventory interface
+- Add item rarity colors and visual effects
+- Create comprehensive item tooltips system
+- Add inventory filtering and search capabilities
+
 ## [0.0.6] - 2025-11-22
 
 ### Changed

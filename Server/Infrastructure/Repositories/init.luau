@@ -24,7 +24,10 @@ function ServerInfrastructureRepositories:init()
 		local domain = container:resolve("Shared.Domain")
 
 		local InventoryEntity = domain.entities.Inventory
-		return InventoryRepository.new(logger, InventoryEntity)
+		local amuletsList = container:resolve("Shared.Data").AmuletsList
+		local fruitsList = container:resolve("Shared.Data").FruitsList
+		local ringsList = container:resolve("Shared.Data").RingsList
+		return InventoryRepository.new(logger, InventoryEntity, amuletsList, fruitsList, ringsList)
 	end)
 
 	self.diContainer:singleton("PlayerRepository", function(container)

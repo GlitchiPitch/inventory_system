@@ -55,19 +55,19 @@ end
 EquipmentSlotEntity.LEFT_HAND = EquipmentSlotEntity.new(
     EquipmentSlotEntity.SlotName.LEFT_HAND,
     "Left Hand",
-    {"weapon"}
+    {"weapon", "ring"}
 )
 
 EquipmentSlotEntity.RIGHT_HAND = EquipmentSlotEntity.new(
     EquipmentSlotEntity.SlotName.RIGHT_HAND,
     "Right Hand",
-    {"weapon"}
+    {"weapon", "ring"}
 )
 
 EquipmentSlotEntity.HELMET = EquipmentSlotEntity.new(
     EquipmentSlotEntity.SlotName.HELMET,
     "Helmet",
-    {"weapon"} -- В этой игре шлем заменен на меч
+    {"amulet"}
 )
 
 ---@param slotName string

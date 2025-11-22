@@ -1,14 +1,18 @@
 ---@class InventoryEntity
 ---@field equippedItems table
 ---@field inventorySlots table
+---@field maxSlots number
 local InventoryEntity = {}
 InventoryEntity.__index = InventoryEntity
+
+local DEFAULT_MAX_SLOTS = 50
 
 ---@return InventoryEntity
 function InventoryEntity.new()
 	local self = setmetatable({}, InventoryEntity)
 	self.equippedItems = {}
 	self.inventorySlots = {}
+	self.maxSlots = DEFAULT_MAX_SLOTS
 	return self
 end
 
@@ -53,17 +57,41 @@ function InventoryEntity:addItem(itemId, count)
 		return false
 	end
 
+	-- Проверить лимит инвентаря (количество уникальных предметов)
+	local currentUniqueItems = 0
+	for _ in pairs(self.inventorySlots) do
+		currentUniqueItems = currentUniqueItems + 1
+	end
+
 	-- Найти существующий слот с этим предметом
-	for _, slot in ipairs(self.inventorySlots) do
-		if slot.id == itemId then
-			slot.count = slot.count + count
-			return true
-		end
+	if self.inventorySlots[itemId] then
+		self.inventorySlots[itemId].count = self.inventorySlots[itemId].count + count
+		return true
+	end
+
+	-- Проверить, не превысит ли добавление нового слота лимит
+	if currentUniqueItems >= self.maxSlots then
+		return false -- Инвентарь полон
 	end
 
 	-- Создать новый слот
-	table.insert(self.inventorySlots, { id = itemId, count = count })
+	self.inventorySlots[itemId] = { id = itemId, count = count }
 	return true
+end
+
+---@return number
+function InventoryEntity:getTotalSlotsUsed()
+	return #self.inventorySlots
+end
+
+---@return number
+function InventoryEntity:getMaxSlots()
+	return self.maxSlots
+end
+
+---@return boolean
+function InventoryEntity:isFull()
+	return self:getTotalSlotsUsed() >= self.maxSlots
 end
 
 ---@param itemId string
@@ -74,19 +102,19 @@ function InventoryEntity:removeItem(itemId, count)
 		return false
 	end
 
-	for i, slot in ipairs(self.inventorySlots) do
-		if slot.id == itemId then
-			if slot.count >= count then
-				slot.count = slot.count - count
-				if slot.count == 0 then
-					table.remove(self.inventorySlots, i)
-				end
-				return true
-			end
-			return false -- Недостаточно предметов
-		end
+	local slot = self.inventorySlots[itemId]
+	if not slot then
+		return false -- Предмет не найден
 	end
-	return false -- Предмет не найден
+
+	if slot.count >= count then
+		slot.count = slot.count - count
+		if slot.count == 0 then
+			self.inventorySlots[itemId] = nil
+		end
+		return true
+	end
+	return false -- Недостаточно предметов
 end
 
 ---@param itemId string

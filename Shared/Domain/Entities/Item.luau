@@ -15,6 +15,8 @@ ItemEntity.ItemType = {
 	ARMOR = "armor",
 	CONSUMABLE = "consumable",
 	MATERIAL = "material",
+	RING = "ring",
+	AMULET = "amulet",
 }
 
 ---@enum ItemRarity
