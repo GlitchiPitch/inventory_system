@@ -61,6 +61,7 @@
 ## Technical Debt
 - [x] **Code Cleanup**: Removed debug print/warn statements from services and repositories
 - [x] **Data Structure Optimization**: Refactored inventory from array to dictionary for O(1) lookup performance
+- [x] **InventoryRepository Refactoring**: Eliminated duplicate code by extracting helper methods (_getMetaPlayer, _ensureEquippedArrays, etc.)
 - [ ] **Unit Tests**: Add comprehensive test coverage
 - [ ] **Error Logging**: Implement structured error reporting
 - [ ] **Performance Monitoring**: Add performance metrics

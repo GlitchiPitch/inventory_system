@@ -1,6 +1,7 @@
 local MetaService = require(game.ServerScriptService.MetaService)
 
 ---@class InventoryService
+---@field logger Logger
 ---@field inventoryRepository InventoryRepository
 ---@field amuletsList table<string, string>
 ---@field ringsList table<string, string>
@@ -8,14 +9,16 @@ local MetaService = require(game.ServerScriptService.MetaService)
 local InventoryService = {}
 InventoryService.__index = InventoryService
 
+---@param logger Logger
 ---@param inventoryRepository InventoryRepository
 ---@param amuletsList table<string, string>
 ---@param ringsList table<string, string>
 ---@param fruitsList table<string, string>
 ---@param EquipmentSlot EquipmentSlotEntity?
 ---@return InventoryService
-function InventoryService.new(inventoryRepository, amuletsList, ringsList, fruitsList, EquipmentSlot)
+function InventoryService.new(logger, inventoryRepository, amuletsList, ringsList, fruitsList, EquipmentSlot)
 	local self = setmetatable({}, InventoryService)
+	self.logger = logger
 	self.inventoryRepository = inventoryRepository
 	self.amuletsList = amuletsList or {}
 	self.ringsList = ringsList or {}
@@ -94,6 +97,14 @@ function InventoryService:removeItem(userId, itemId, count)
 		return false, "Insufficient item count"
 	end
 
+	-- Проверить, что ни один экземпляр этого предмета не экипирован
+	for equippedSlotName, equippedSlotId in pairs(inventory.equippedItems) do
+		local equippedItemName = string.match(equippedSlotId, "^(.+)_%d+$")
+		if equippedItemName == itemId then
+			return false, "Cannot remove equipped item"
+		end
+	end
+
 	local success = self.inventoryRepository:removeItemFromPlayer(userId, itemId, count)
 	if not success then
 		return false, "Failed to remove item from inventory"
@@ -103,45 +114,65 @@ function InventoryService:removeItem(userId, itemId, count)
 end
 
 ---@param userId string
----@param itemId string
+---@param slotId string
 ---@param slotName string
 ---@return boolean, string?
-function InventoryService:equipItem(userId, itemId, slotName)
+function InventoryService:equipItem(userId, slotId, slotName)
 	local inventory = self.inventoryRepository:getByPlayerId(userId)
 	if not inventory then
 		return false, "Player inventory not found"
 	end
 
+	-- Извлечь itemName из slotId
+	local itemName = string.match(slotId, "^(.+)_%d+$")
+	if not itemName then
+		return false, "Invalid slotId format"
+	end
+
+
 	-- Проверить, есть ли предмет в инвентаре
-	if not inventory:hasItem(itemId) then
+	if not inventory:hasItem(itemName) then
 		return false, "Item not found in inventory"
 	end
 
-	-- Получить слот экипировки
+	-- Проверить, что slotId существует в inventorySlots
+	local slotExists = false
+	if inventory.inventorySlots[itemName] then
+		for _, slotData in ipairs(inventory.inventorySlots[itemName]) do
+			if slotData.slotId == slotId then
+				slotExists = true
+				break
+			end
+		end
+	end
+	if not slotExists then
+		return false, "Slot not found in inventory"
+	end
+
 	local slot = self.EquipmentSlot:getByName(slotName)
 	if not slot then
 		return false, "Invalid equipment slot"
 	end
 
 	-- Валидация предмета - проверить что он существует и может быть экипирован
-	if not self.allItemIcons[itemId] then
+	if not self.allItemIcons[itemName] then
 		return false, "Unknown item"
 	end
 
 	-- Проверить, что предмет не является фруктом
-	if self.fruitsList[itemId] then
+	if self.fruitsList[itemName] then
 		local metaPlayer = MetaService.Class.Player:Get(game.Players:GetPlayerByUserId(tonumber(userId)))
 		metaPlayer:Notification("Fruits cannot be equipped", 3, Color3.new(1, 0.239215, 0.239215))
 		return false, "Fruits cannot be equipped"
 	end
 
 	-- Проверить совместимость слота с типом предмета
-	local itemType = self:getItemType(itemId)
+	local itemType = self:getItemType(itemName)
 	if not slot:canEquipItemType(itemType) then
 		return false, "Item cannot be equipped in this slot"
 	end
 
-	local success = self.inventoryRepository:equipItem(userId, itemId, slot)
+	local success = self.inventoryRepository:equipItem(userId, slotId, slot)
 	if not success then
 		return false, "Failed to equip item"
 	end

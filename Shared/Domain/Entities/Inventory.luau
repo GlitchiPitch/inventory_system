@@ -35,10 +35,8 @@ end
 ---@param itemId string
 ---@return number
 function InventoryEntity:getItemCount(itemId)
-	for slotName, slot in pairs(self.inventorySlots) do
-		if slotName == itemId then
-			return slot.count
-		end
+	if self.inventorySlots[itemId] then
+		return #self.inventorySlots[itemId]
 	end
 	return 0
 end
@@ -57,31 +55,35 @@ function InventoryEntity:addItem(itemId, count)
 		return false
 	end
 
-	-- Проверить лимит инвентаря (количество уникальных предметов)
-	local currentUniqueItems = 0
-	for _ in pairs(self.inventorySlots) do
-		currentUniqueItems = currentUniqueItems + 1
-	end
+	-- Проверить лимит инвентаря (количество всех слотов)
+	local currentSlotsUsed = self:getTotalSlotsUsed()
 
-	-- Найти существующий слот с этим предметом
-	if self.inventorySlots[itemId] then
-		self.inventorySlots[itemId].count = self.inventorySlots[itemId].count + count
-		return true
-	end
-
-	-- Проверить, не превысит ли добавление нового слота лимит
-	if currentUniqueItems >= self.maxSlots then
+	-- Проверить, не превысит ли добавление новых слотов лимит
+	if currentSlotsUsed + count > self.maxSlots then
 		return false -- Инвентарь полон
 	end
 
-	-- Создать новый слот
-	self.inventorySlots[itemId] = { id = itemId, count = count }
+	-- Инициализировать массив слотов для этого предмета, если его нет
+	if not self.inventorySlots[itemId] then
+		self.inventorySlots[itemId] = {}
+	end
+
+	-- Добавить count отдельных слотов для этого предмета
+	for i = 1, count do
+		local slotId = itemId .. "_" .. (#self.inventorySlots[itemId] + 1)
+		table.insert(self.inventorySlots[itemId], { id = itemId, slotId = slotId })
+	end
+
 	return true
 end
 
 ---@return number
 function InventoryEntity:getTotalSlotsUsed()
-	return #self.inventorySlots
+	local totalSlots = 0
+	for _, itemSlots in pairs(self.inventorySlots) do
+		totalSlots = totalSlots + #itemSlots
+	end
+	return totalSlots
 end
 
 ---@return number
@@ -102,27 +104,50 @@ function InventoryEntity:removeItem(itemId, count)
 		return false
 	end
 
-	local slot = self.inventorySlots[itemId]
-	if not slot then
-		return false -- Предмет не найден
+	local itemSlots = self.inventorySlots[itemId]
+	if not itemSlots or #itemSlots < count then
+		return false -- Недостаточно предметов
 	end
 
-	if slot.count >= count then
-		slot.count = slot.count - count
-		if slot.count == 0 then
-			self.inventorySlots[itemId] = nil
-		end
-		return true
+	-- Удалить count слотов с конца массива
+	for i = 1, count do
+		table.remove(itemSlots)
 	end
-	return false -- Недостаточно предметов
+
+	-- Если слотов не осталось, удалить запись полностью
+	if #itemSlots == 0 then
+		self.inventorySlots[itemId] = nil
+	end
+
+	return true
 end
 
----@param itemId string
+---@param slotId string
 ---@param slot EquipmentSlotEntity
 ---@return boolean
-function InventoryEntity:equipItem(itemId, slot)
+function InventoryEntity:equipItem(slotId, slot)
+	-- Извлечь itemName из slotId (убираем "_номер")
+	local itemName = string.match(slotId, "^(.+)_%d+$")
+	if not itemName then
+		return false
+	end
+
 	-- Проверить, есть ли предмет в инвентаре
-	if not self:hasItem(itemId) then
+	if not self:hasItem(itemName) then
+		return false
+	end
+
+	-- Проверить, что slotId действительно существует в inventorySlots
+	local slotExists = false
+	if self.inventorySlots[itemName] then
+		for _, slotData in ipairs(self.inventorySlots[itemName]) do
+			if slotData.slotId == slotId then
+				slotExists = true
+				break
+			end
+		end
+	end
+	if not slotExists then
 		return false
 	end
 
@@ -133,15 +158,21 @@ function InventoryEntity:equipItem(itemId, slot)
 	end
 
 	-- Экипировать новый предмет
-	self.equippedItems[slot:getName()] = itemId
+	self.equippedItems[slot:getName()] = slotId
 	return true
 end
 
 ---@param slot EquipmentSlotEntity
----@return boolean
+---@return boolean, string?
 function InventoryEntity:unequipItem(slot)
-	local equippedItem = self:getEquippedItem(slot)
-	if not equippedItem then
+	local equippedSlotId = self:getEquippedItem(slot)
+	if not equippedSlotId then
+		return false
+	end
+
+	-- Извлечь itemName из slotId
+	local itemName = string.match(equippedSlotId, "^(.+)_%d+$")
+	if not itemName then
 		return false
 	end
 
@@ -149,11 +180,11 @@ function InventoryEntity:unequipItem(slot)
 	self.equippedItems[slot:getName()] = nil
 
 	-- Вернуть предмет в инвентарь (если его там нет)
-	if not self:hasItem(equippedItem) then
-		self:addItem(equippedItem, 1)
+	if not self:hasItem(itemName) then
+		self:addItem(itemName, 1)
 	end
 
-	return true, equippedItem
+	return true, equippedSlotId
 end
 
 ---@return table

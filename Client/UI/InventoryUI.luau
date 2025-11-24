@@ -162,54 +162,65 @@ function InventoryUI:createSlots(inventoryData)
 	-- Очищаем существующие слоты перед созданием новых
 	self:clearSlots()
 
-	for slotName, slotData in pairs(inventoryData.inventorySlots) do
-		local slot = self.slotTemplate:Clone()
-		slot.Name = slotName
-		slot.CountLabel.Text = slotData.count
-		slot.Parent = self.inventoryFrame
-		slot.ItemNameLabel.Text = slotName
-		slot.ItemIcon.Image = self.allItemIcons[slotName] or ""
-		slot.Visible = true
+	local slotIndex = 0
+	for itemName, itemSlots in pairs(inventoryData.inventorySlots) do
+		-- Для каждого экземпляра предмета создаем отдельный слот
+		for i, slotData in ipairs(itemSlots) do
+			slotIndex = slotIndex + 1
+			local slot = self.slotTemplate:Clone()
+			local slotId = itemName .. "_" .. i -- Уникальный ID для каждого слота
+			slot.Name = slotId
+			slot.CountLabel.Text = "1" -- Каждый слот содержит 1 экземпляр
+			slot.Parent = self.inventoryFrame
+			slot.ItemNameLabel.Text = itemName
+			slot.ItemIcon.Image = self.allItemIcons[itemName] or ""
+			slot.Visible = true
 
-		-- Проверяем, экипирован ли предмет, и показываем Checkmark
-		local currentInventoryData = self.inventoryClientService:getInventoryData()
-		local checkmark = slot:FindFirstChild("Checkmark")
-		if checkmark then
-			local isEquipped = false
-			if currentInventoryData and currentInventoryData.equippedItems then
-				for _, equippedItemId in pairs(currentInventoryData.equippedItems) do
-					if equippedItemId == slotName then
-						isEquipped = true
-						break
+			-- Проверяем, экипирован ли этот конкретный слот, и показываем Checkmark
+			local currentInventoryData = self.inventoryClientService:getInventoryData()
+			local checkmark = slot:FindFirstChild("Checkmark")
+			if checkmark then
+				local isEquipped = false
+				if currentInventoryData and currentInventoryData.equippedItems then
+					for _, equippedSlotId in pairs(currentInventoryData.equippedItems) do
+						if equippedSlotId == slotId then
+							isEquipped = true
+							break
+						end
+					end
+				end
+				checkmark.Visible = isEquipped
+			end
+
+			-- Устанавливаем иконку и значение бонуса
+			local bonusData = self.allItemBonuses[itemName]
+			if bonusData then
+				local bonusIconLabel = slot:FindFirstChild("BonusIconLabel")
+				if bonusIconLabel then
+					-- Скрываем bonusIconLabel для фруктов
+					if self.fruitsList[itemName] then
+						bonusIconLabel.Visible = false
+					else
+						local bonusIcon = self.bonusIcons[bonusData.bonusType]
+						if bonusIcon then
+							bonusIconLabel.Image = bonusIcon
+							local bonusValueLabel = bonusIconLabel:FindFirstChild("BonusValueLabel")
+							if bonusValueLabel then
+								bonusValueLabel.Text = "+" .. tostring(bonusData.bonusValue * 100) .. "%"
+							end
+						end
 					end
 				end
 			end
-			checkmark.Visible = isEquipped
+
+			slot.MouseButton1Click:Connect(function()
+				self:onSlotClicked(slotId) -- Передаем уникальный ID слота
+			end)
+
+			local item = self.ItemEntity.new(slotId, itemName, "weapon", slot)
+			table.insert(self.inventorySlots, item)
+			self.itemSlots[slotId] = slot -- Сохраняем UI слот по уникальному ID
 		end
-
-		-- Устанавливаем иконку и значение бонуса
-		local bonusData = self.allItemBonuses[slotName]
-		if bonusData then
-			local bonusIconLabel = slot:FindFirstChild("BonusIconLabel")
-			if bonusIconLabel then
-				local bonusIcon = self.bonusIcons[bonusData.bonusType]
-				if bonusIcon then
-					bonusIconLabel.Image = bonusIcon
-					local bonusValueLabel = bonusIconLabel:FindFirstChild("BonusValueLabel")
-					if bonusValueLabel then
-						bonusValueLabel.Text = "+" .. tostring(bonusData.bonusValue * 100) .. "%"
-					end
-				end
-			end
-		end
-
-		slot.MouseButton1Click:Connect(function()
-			self:onSlotClicked(slotName) -- Передаем имя слота
-		end)
-
-		local item = self.ItemEntity.new(slotName, slotName, "weapon", slot)
-		table.insert(self.inventorySlots, item)
-		self.itemSlots[slotName] = slot -- Сохраняем UI слот по имени предмета
 	end
 end
 
@@ -237,11 +248,11 @@ function InventoryUI:setupEventHandlers()
 	-- Обработчик снятия экипировки
 	local remoteEventService = self.inventoryClientService.remoteEventService
 	remoteEventService:connectToEvent("ItemUnequipped", function(args)
-		self:onItemUnequipped(args.itemId)
+		self:onItemUnequipped(args.slotId)
 	end)
 end
 
-function InventoryUI:onSlotClicked(slotIndex)
+function InventoryUI:onSlotClicked(slotId)
 	if self.isEquipmentWindowOpen then
 		return
 	end
@@ -251,62 +262,58 @@ function InventoryUI:onSlotClicked(slotIndex)
 		return
 	end
 
-	if not inventoryData.inventorySlots then
+	-- Извлекаем имя предмета из slotId (убираем "_номер")
+	local itemName = string.match(slotId, "^(.+)_%d+$")
+	if not itemName then
 		return
 	end
 
-	local slotData = inventoryData.inventorySlots[slotIndex]
-	if not slotData then
-		return
-	end
-	if slotData then
-		if self.isDeleteMode then
-			-- Режим удаления - удаляем предмет
-			self:deleteItem(slotData.id, slotData.count)
+	if self.isDeleteMode then
+		-- Режим удаления - удаляем один экземпляр предмета
+		self:deleteItem(itemName, 1)
+	else
+		-- Обычный режим - экипировка/снятие
+		-- Сбрасываем выделение всех UI слотов
+		for _, slotButton in pairs(self.itemSlots) do
+			slotButton.BorderColor3 = Color3.fromRGB(100, 100, 100)
+		end
+
+		-- Выделяем текущий слот
+		if self.itemSlots[slotId] then
+			self.itemSlots[slotId].BorderColor3 = Color3.fromRGB(255, 255, 0) -- Желтая рамка для выделения
+		end
+
+		-- Проверяем, экипирован ли уже этот конкретный слот
+		local isEquipped = false
+		local equippedSlotName = nil
+		if inventoryData.equippedItems then
+			for slotName, equippedSlotId in pairs(inventoryData.equippedItems) do
+				if equippedSlotId == slotId then
+					isEquipped = true
+					equippedSlotName = slotName
+					break
+				end
+			end
+		end
+
+		if isEquipped then
+			-- Этот слот экипирован, снимаем его
+			self.inventoryClientService:requestUnequipItem(equippedSlotName)
 		else
-			-- Обычный режим - экипировка/снятие
-			-- Сбрасываем выделение всех UI слотов
-			for _, slotButton in pairs(self.itemSlots) do
-				slotButton.BorderColor3 = Color3.fromRGB(100, 100, 100)
-			end
-
-			-- Выделяем текущий слот
-			if self.itemSlots[slotIndex] then
-				self.itemSlots[slotIndex].BorderColor3 = Color3.fromRGB(255, 255, 0) -- Желтая рамка для выделения
-			end
-
-			-- Проверяем, экипирован ли уже этот предмет
-			local isEquipped = false
-			local equippedSlotName = nil
-			if inventoryData.equippedItems then
-				for slotName, equippedItemId in pairs(inventoryData.equippedItems) do
-					if equippedItemId == slotData.id then
-						isEquipped = true
-						equippedSlotName = slotName
-						break
-					end
-				end
-			end
-
-			if isEquipped then
-				-- Предмет уже экипирован, снимаем его
-				self.inventoryClientService:requestUnequipItem(equippedSlotName)
+			-- Этот слот не экипирован, ищем свободный слот экипировки
+			local itemType = self.inventoryClientService:getItemType(itemName)
+			local freeSlot = self:findFreeEquipmentSlot(itemType)
+			if freeSlot then
+				-- Отправляем запрос на экипировку этого конкретного слота
+				self.inventoryClientService:requestEquipItem(slotId, freeSlot:getName())
 			else
-				-- Предмет не экипирован, ищем свободный слот
-				local itemType = self.inventoryClientService:getItemType(slotData.id)
-				local freeSlot = self:findFreeEquipmentSlot(itemType)
-				if freeSlot then
-					-- Отправляем запрос на экипировку
-					self.inventoryClientService:requestEquipItem(slotData.id, freeSlot:getName())
-				else
-					MetaService.Self:Fire(
-						"Notification",
-						"Create",
-						"No free equipment slot available for item",
-						5,
-						Color3.new(0.8, 0, 1)
-					)
-				end
+				MetaService.Self:Fire(
+					"Notification",
+					"Create",
+					"No free equipment slot available for item",
+					5,
+					Color3.new(0.8, 0, 1)
+				)
 			end
 		end
 	end
@@ -317,11 +324,13 @@ function InventoryUI:deleteItem(itemId, count)
 		return
 	end
 
-	-- Проверяем, экипирован ли предмет
+	-- Проверяем, экипирован ли хотя бы один экземпляр этого предмета
 	local inventoryData = self.inventoryClientService:getInventoryData()
 	if inventoryData and inventoryData.equippedItems then
-		for _, equippedItemId in pairs(inventoryData.equippedItems) do
-			if equippedItemId == itemId then
+		for _, equippedSlotId in pairs(inventoryData.equippedItems) do
+			-- Извлекаем itemName из equippedSlotId
+			local equippedItemName = string.match(equippedSlotId, "^(.+)_%d+$")
+			if equippedItemName == itemId then
 				-- Предмет экипирован, нельзя удалить
 				MetaService.Self:Fire("Notification", "Create", "Cannot delete equipped item", 3, Color3.new(1, 0, 0))
 				return
@@ -402,16 +411,13 @@ function InventoryUI:onEquipmentSlotClicked(slotName)
 	end
 end
 
-function InventoryUI:onItemEquipped(itemId)
-	-- Находим UI слот инвентаря с этим предметом и показываем Checkmark
-	for _, slotButton in pairs(self.itemSlots) do
-		local itemNameLabel = slotButton:FindFirstChild("ItemNameLabel")
-		if itemNameLabel and itemNameLabel.Text == itemId then
-			local checkmark = slotButton:FindFirstChild("Checkmark")
-			if checkmark then
-				checkmark.Visible = true
-			end
-			break
+function InventoryUI:onItemEquipped(slotId)
+	-- Находим конкретный UI слот и показываем Checkmark
+	local slotButton = self.itemSlots[slotId]
+	if slotButton then
+		local checkmark = slotButton:FindFirstChild("Checkmark")
+		if checkmark then
+			checkmark.Visible = true
 		end
 	end
 
@@ -419,16 +425,13 @@ function InventoryUI:onItemEquipped(itemId)
 	self:updateEquipmentSlots()
 end
 
-function InventoryUI:onItemUnequipped(itemId)
-	-- Находим UI слот инвентаря с этим предметом и скрываем Checkmark
-	for _, slotButton in pairs(self.itemSlots) do
-		local itemNameLabel = slotButton:FindFirstChild("ItemNameLabel")
-		if itemNameLabel and itemNameLabel.Text == itemId then
-			local checkmark = slotButton:FindFirstChild("Checkmark")
-			if checkmark then
-				checkmark.Visible = false
-			end
-			break
+function InventoryUI:onItemUnequipped(slotId)
+	-- Находим конкретный UI слот и скрываем Checkmark
+	local slotButton = self.itemSlots[slotId]
+	if slotButton then
+		local checkmark = slotButton:FindFirstChild("Checkmark")
+		if checkmark then
+			checkmark.Visible = false
 		end
 	end
 
@@ -453,8 +456,10 @@ function InventoryUI:updateEquipmentSlots()
 
 		if equippedIcon then
 			if equippedItemId then
-				-- Получаем иконку предмета
-				local itemIconId = allItemIcons[equippedItemId] or "0"
+				-- Извлекаем имя предмета из equippedItemId (убираем "_номер")
+				local itemName = string.match(equippedItemId, "^(.+)_%d+$")
+				-- Получаем иконку предмета по имени
+				local itemIconId = itemName and allItemIcons[itemName] or "0"
 				equippedIcon.Image = itemIconId or ""
 				slotButton.BackgroundColor3 = Color3.fromRGB(80, 80, 120) -- Выделяем занятые слоты
 				slotButton.TextTransparency = 1 -- Полупрозрачный текст для занятых слотов
@@ -478,7 +483,11 @@ function InventoryUI:updateSlotsInfoLabel()
 		return
 	end
 
-	local usedSlots = #inventoryData.inventorySlots
+	local usedSlots = 0
+	for _, itemSlots in pairs(inventoryData.inventorySlots) do
+		usedSlots = usedSlots + #itemSlots
+	end
+
 	local maxSlots = 50 -- Можно получить из InventoryEntity если понадобится
 	local freeSlots = maxSlots - usedSlots
 

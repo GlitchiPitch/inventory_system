@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.10] - 2025-11-24
+
+### Refactored
+- **InventoryRepository Code Cleanup**: Eliminated duplicate code in InventoryRepository by extracting helper methods
+- **Helper Methods**: Added _getMetaPlayer, _ensureEquippedArrays, _validateNumber, _addToEquippedArray, _removeFromEquippedArray, _handleEquippedItemLogic
+- **Unified Item Type Checking**: Replaced three separate checkIs* methods with universal checkItemType method
+- **Code Reduction**: Reduced file size from 375 to 364 lines while improving maintainability
+
+### Technical Details
+- **DRY Principle**: Eliminated repetitive metaPlayer.Data.Inventory access patterns
+- **Helper Functions**: Centralized equipment array management and data validation logic
+- **Performance**: Maintained O(1) lookup performance for inventory operations
+- **Maintainability**: Improved code readability and reduced duplication across equip/unequip methods
+
+### Next Steps
+- Complete drag-and-drop inventory UI implementation
+- Add item rarity colors and visual effects
+- Implement comprehensive item tooltips with stats
+- Create inventory filtering and search system
+
 ## [0.0.9] - 2025-11-22
 
 ### Added

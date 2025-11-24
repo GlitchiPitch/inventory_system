@@ -45,12 +45,15 @@ function InventoryClientService:setupEventHandlers()
 	-- Обработчик успешной экипировки
 	self.remoteEventService:connectToEvent("ItemEquipped", function(args)
 		if self._onItemEquipped then
-			self._onItemEquipped(args.itemId, args.slotName)
+			self._onItemEquipped(args.slotId, args.slotName)
 		end
 	end)
 
 	-- Обработчик успешного снятия экипировки
-	self.remoteEventService:connectToEvent("ItemUnequipped", function(_args)
+	self.remoteEventService:connectToEvent("ItemUnequipped", function(args)
+		if self._onItemUnequipped then
+			self._onItemUnequipped(args.slotId)
+		end
 	end)
 end
 
@@ -82,11 +85,11 @@ function InventoryClientService:requestRemoveItem(itemId, count)
 	})
 end
 
----@param itemId string
+---@param slotId string
 ---@param slotName string
-function InventoryClientService:requestEquipItem(itemId, slotName)
+function InventoryClientService:requestEquipItem(slotId, slotName)
 	self.remoteEventService:fireServer("EquipItem", {
-		itemId = itemId,
+		slotId = slotId,
 		slotName = slotName,
 	})
 end

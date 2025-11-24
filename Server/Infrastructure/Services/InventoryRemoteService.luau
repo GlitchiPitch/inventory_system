@@ -109,17 +109,17 @@ end
 ---@param args table
 function InventoryRemoteService:handleEquipItem(player, args)
     local userId = tostring(player.UserId)
-    local itemId = args.itemId
+    local slotId = args.slotId
     local slotName = args.slotName
-    
-    if not itemId or not slotName then
-        self.remoteEventService:fireClient(player, "Error", {message = "ItemId and slotName are required"})
+
+    if not slotId or not slotName then
+        self.remoteEventService:fireClient(player, "Error", {message = "SlotId and slotName are required"})
         return
     end
 
-    local success, errorMessage = self.inventoryService:equipItem(userId, itemId, slotName)
+    local success, errorMessage = self.inventoryService:equipItem(userId, slotId, slotName)
     if success then
-        self.remoteEventService:fireClient(player, "ItemEquipped", {itemId = itemId, slotName = slotName})
+        self.remoteEventService:fireClient(player, "ItemEquipped", {slotId = slotId, slotName = slotName})
         -- Отправить обновленный инвентарь
         self:handleGetInventory(player)
     else
@@ -138,9 +138,9 @@ function InventoryRemoteService:handleUnequipItem(player, args)
         return
     end
 
-    local success, unequippedItem = self.inventoryService:unequipItem(userId, slotName)
+    local success, unequippedSlotId = self.inventoryService:unequipItem(userId, slotName)
     if success then
-        self.remoteEventService:fireClient(player, "ItemUnequipped", {itemId = unequippedItem})
+        self.remoteEventService:fireClient(player, "ItemUnequipped", {slotId = unequippedSlotId or ""})
         -- Отправить обновленный инвентарь
         self:handleGetInventory(player)
     else
