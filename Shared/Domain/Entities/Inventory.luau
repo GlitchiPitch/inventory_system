@@ -154,10 +154,12 @@ function InventoryEntity:equipItem(slotId, slot)
 	-- Снять текущий предмет из слота, если есть
 	local currentEquipped = self:getEquippedItem(slot)
 	if currentEquipped then
+		print("InventoryEntity: Unequipping existing item", currentEquipped, "from slot", slot:getName())
 		self:unequipItem(slot)
 	end
 
 	-- Экипировать новый предмет
+	print("InventoryEntity: Equipping item", slotId, "in slot", slot:getName())
 	self.equippedItems[slot:getName()] = slotId
 	return true
 end

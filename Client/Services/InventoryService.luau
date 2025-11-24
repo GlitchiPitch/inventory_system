@@ -7,8 +7,9 @@ local InventoryClientService = {}
 InventoryClientService.__index = InventoryClientService
 
 ---@param remoteEventService RemoteEventService
+---@param logger LoggerService
 ---@return InventoryClientService
-function InventoryClientService.new(remoteEventService, amuletsList, ringsList, fruitsList)
+function InventoryClientService.new(remoteEventService, amuletsList, ringsList, fruitsList, logger)
 	local self = setmetatable({}, InventoryClientService)
 	self.remoteEventService = remoteEventService
 	self._inventoryData = nil
@@ -17,40 +18,73 @@ function InventoryClientService.new(remoteEventService, amuletsList, ringsList, 
 	self._amuletsList = amuletsList
 	self._ringsList = ringsList
 	self._fruitsList = fruitsList
+	self.logger = logger
 	self:setupEventHandlers()
 	return self
 end
 
 function InventoryClientService:setupEventHandlers()
+	self.logger:info("InventoryClientService", "Setting up event handlers")
+
 	-- Обработчик обновления инвентаря
 	self.remoteEventService:connectToEvent("InventoryUpdated", function(args)
+		self.logger:info("InventoryClientService", "Received InventoryUpdated event - equippedItems:", args.equippedItems or "none")
 		self._inventoryData = args
 		if self._onInventoryUpdated then
 			self._onInventoryUpdated(self._inventoryData)
+		else
+			self.logger:warn("InventoryClientService", "No _onInventoryUpdated callback set")
 		end
 	end)
 
 	-- Обработчик ошибок
-	self.remoteEventService:connectToEvent("Error", function(_args)
+	self.remoteEventService:connectToEvent("Error", function(args)
+		self.logger:error("InventoryClientService", "Received Error event:", args)
 	end)
 
 	-- Обработчик успешного добавления предмета
-	self.remoteEventService:connectToEvent("ItemAdded", function(_args)
+	self.remoteEventService:connectToEvent("ItemAdded", function(args)
+		self.logger:info("InventoryClientService", "Received ItemAdded event:", args)
 	end)
 
 	-- Обработчик успешного удаления предмета
-	self.remoteEventService:connectToEvent("ItemRemoved", function(_args)
+	self.remoteEventService:connectToEvent("ItemRemoved", function(args)
+		self.logger:info("InventoryClientService", "Received ItemRemoved event:", args)
 	end)
 
 	-- Обработчик успешной экипировки
 	self.remoteEventService:connectToEvent("ItemEquipped", function(args)
+		self.logger:info("InventoryClientService", "Received ItemEquipped event - slotId:", args.slotId, "slotName:", args.slotName)
+
+		-- Обновляем локальные данные equippedItems
+		if self._inventoryData and self._inventoryData.equippedItems then
+			self._inventoryData.equippedItems[args.slotName] = args.slotId
+			self.logger:debug("InventoryClientService", "Updated local equippedItems:", self._inventoryData.equippedItems)
+		end
+
 		if self._onItemEquipped then
 			self._onItemEquipped(args.slotId, args.slotName)
+		else
+			self.logger:warn("InventoryClientService", "No _onItemEquipped callback set")
 		end
 	end)
 
 	-- Обработчик успешного снятия экипировки
 	self.remoteEventService:connectToEvent("ItemUnequipped", function(args)
+		self.logger:info("InventoryClientService", "Received ItemUnequipped event - slotId:", args.slotId)
+
+		-- Обновляем локальные данные equippedItems
+		if self._inventoryData and self._inventoryData.equippedItems then
+			-- Находим и удаляем slotId из equippedItems
+			for slotName, equippedSlotId in pairs(self._inventoryData.equippedItems) do
+				if equippedSlotId == args.slotId then
+					self._inventoryData.equippedItems[slotName] = nil
+					self.logger:debug("InventoryClientService", "Removed from local equippedItems:", slotName)
+					break
+				end
+			end
+		end
+
 		if self._onItemUnequipped then
 			self._onItemUnequipped(args.slotId)
 		end
@@ -64,6 +98,7 @@ end
 
 --- Запросить инвентарь с сервера
 function InventoryClientService:requestInventory()
+	self.logger:info("InventoryClientService", "Requesting inventory from server")
 	self.remoteEventService:fireServer("GetInventory", {})
 end
 
@@ -79,6 +114,7 @@ end
 ---@param itemId string
 ---@param count number?
 function InventoryClientService:requestRemoveItem(itemId, count)
+	self.logger:info("InventoryClientService", "Requesting to remove item:", itemId, "count:", count or 1)
 	self.remoteEventService:fireServer("RemoveItem", {
 		itemId = itemId,
 		count = count or 1,
@@ -88,6 +124,7 @@ end
 ---@param slotId string
 ---@param slotName string
 function InventoryClientService:requestEquipItem(slotId, slotName)
+	self.logger:info("InventoryClientService", "Requesting to equip item. SlotId:", slotId, "SlotName:", slotName)
 	self.remoteEventService:fireServer("EquipItem", {
 		slotId = slotId,
 		slotName = slotName,
@@ -96,6 +133,7 @@ end
 
 ---@param slotName string
 function InventoryClientService:requestUnequipItem(slotName)
+	self.logger:info("InventoryClientService", "Requesting to unequip item from slot:", slotName)
 	self.remoteEventService:fireServer("UnequipItem", {
 		slotName = slotName,
 	})
@@ -157,6 +195,11 @@ end
 ---@param callback function(itemId: string, slotName: string)
 function InventoryClientService:setOnItemEquipped(callback)
 	self._onItemEquipped = callback
+end
+
+---@param callback function(slotId: string)
+function InventoryClientService:setOnItemUnequipped(callback)
+	self._onItemUnequipped = callback
 end
 
 ---@param itemId string

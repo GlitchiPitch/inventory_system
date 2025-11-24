@@ -56,11 +56,17 @@ end
 ---@param item table
 ---@return string?
 function InventoryRepository:_getSlotNameForItem(item)
-	if item.type == "ring" then
-		return "RingSlot"
-	elseif item.type == "amulet" then
-		return "AmuletSlot"
+	local itemType = self:_getItemType(item.name)
+	if itemType == "ring" then
+		-- Для колец используем правую руку по умолчанию (как в клиенте)
+		self.logger:debug("InventoryRepository", "Assigning rightHand slot for ring item:", item.name)
+		return "rightHand"
+	elseif itemType == "amulet" then
+		-- Для амулетов используем шлем
+		self.logger:debug("InventoryRepository", "Assigning helmet slot for amulet item:", item.name)
+		return "helmet"
 	else
+		self.logger:debug("InventoryRepository", "No slot assigned for item:", item.name, "type:", itemType)
 		return nil -- Для фруктов и других предметов слоты могут не быть нужны
 	end
 end
@@ -114,20 +120,15 @@ function InventoryRepository:_handleEquippedItemLogic(userId, itemName, action)
 		return
 	end
 
-	local itemType = nil
-	if self:checkItemType("ring", itemName) then
-		itemType = "ring"
-	elseif self:checkItemType("amulet", itemName) then
-		itemType = "amulet"
-	end
-
-	if not itemType then
+	-- Проверить, что предмет может быть экипирован (кольцо или амулет)
+	local isEquipable = self:checkItemType("ring", itemName) or self:checkItemType("amulet", itemName)
+	if not isEquipable then
 		return
 	end
 
 	-- Найти первый предмет с данным именем и установить/снять флаг equipped
 	for _, item in ipairs(accessories) do
-		if item.name == itemName and item.type == itemType then
+		if item.name == itemName then
 			item.equipped = (action == "add")
 			break -- Меняем только первый найденный предмет
 		end
@@ -196,23 +197,30 @@ function InventoryRepository:getByPlayerId(userId)
 		-- Все предметы в массиве принадлежат игроку
 		itemCounts[item.name] = (itemCounts[item.name] or 0) + 1
 		if item.equipped then
-			-- Предполагаем, что equipped предметы имеют slot информацию
-			-- Нужно определить slot name на основе типа предмета
-			local slotName = self:_getSlotNameForItem(item)
+			-- Использовать сохраненный slotId или slotName
+			local slotName = item.slotName or self:_getSlotNameForItem(item)
 			if slotName then
-				equippedItems[slotName] = item.name .. "_1" -- Используем первый слот
+				if item.slotId then
+					-- У нас есть конкретный slotId
+					equippedItems[slotName] = item.slotId
+					self.logger:debug("InventoryRepository", "Loading equipped item:", item.name, "slotId:", item.slotId, "in slot:", slotName)
+				else
+					-- Fallback: определить slotId на основе типа предмета
+					equippedItems[slotName] = item.name .. "_1"
+					self.logger:debug("InventoryRepository", "Loading equipped item (fallback):", item.name, "in slot:", slotName, "slotId:", item.name .. "_1")
+				end
 			end
 		end
-	end
 
-	-- Создать inventorySlots на основе подсчитанных предметов
-	for itemName, count in pairs(itemCounts) do
-		local validatedCount = self:_validateNumber(count)
-		if validatedCount > 0 then
-			inventorySlots[itemName] = {}
-			for i = 1, validatedCount do
-				local slotId = itemName .. "_" .. i
-				table.insert(inventorySlots[itemName], { id = itemName, slotId = slotId })
+		-- Создать inventorySlots на основе подсчитанных предметов
+		for itemName, count in pairs(itemCounts) do
+			local validatedCount = self:_validateNumber(count)
+			if validatedCount > 0 then
+				inventorySlots[itemName] = {}
+				for i = 1, validatedCount do
+					local slotId = itemName .. "_" .. i
+					table.insert(inventorySlots[itemName], { id = itemName, slotId = slotId })
+				end
 			end
 		end
 	end
@@ -247,13 +255,14 @@ function InventoryRepository:save(userId, inventory)
 
 	local data = inventory:toDataStructure()
 
-	-- Создать словарь equipped предметов для быстрого поиска
+	-- Создать словарь equipped предметов для быстрого поиска (по slotId)
 	local equippedItemsMap = {}
 	for slotName, slotId in pairs(data.equippedItems) do
-		local itemName = string.match(slotId, "^(.+)_%d+$")
-		if itemName then
-			equippedItemsMap[itemName] = slotName
-		end
+		equippedItemsMap[slotId] = {
+			slotName = slotName,
+			slotId = slotId
+		}
+		self.logger:debug("InventoryRepository", "Preparing to save equipped item:", slotId, "in slot:", slotName)
 	end
 
 	-- Создать словарь предметов в инвентаре с их количеством
@@ -271,15 +280,25 @@ function InventoryRepository:save(userId, inventory)
 	-- Добавить предметы из инвентаря
 	for itemName, count in pairs(inventoryItemsMap) do
 		local itemType = self:_getItemType(itemName)
-		local isEquipped = equippedItemsMap[itemName] ~= nil
 
 		-- Для каждого экземпляра предмета добавить отдельный элемент
 		for i = 1, count do
+			local slotId = itemName .. "_" .. i
+			local equippedInfo = equippedItemsMap[slotId]
+			local isEquipped = equippedInfo ~= nil
+
 			local itemData = {
 				name = itemName,
 				type = itemType,
 				equipped = isEquipped
 			}
+
+			-- Добавить slotName и slotId для экипированных предметов
+			if isEquipped then
+				itemData.slotName = equippedInfo.slotName
+				itemData.slotId = equippedInfo.slotId
+				self.logger:debug("InventoryRepository", "Saving equipped item:", itemName, "slotId:", slotId, "slotName:", equippedInfo.slotName)
+			end
 
 			-- Добавить level если есть в существующих данных
 			local existingItem = self:_findExistingItem(currentAccessories, itemName, i)
@@ -351,11 +370,19 @@ function InventoryRepository:equipItem(userId, slotId, slot)
 
 	local success = inventory:equipItem(slotId, slot)
 	if success then
+		self.logger:info("InventoryRepository", "Equipping item", slotId, "in slot", slot:getName(), "- saving inventory")
 		self:save(userId, inventory)
 
 		-- Извлечь itemName из slotId для дополнительной логики
 		local itemName = string.match(slotId, "^(.+)_%d+$")
 		self:_handleEquippedItemLogic(userId, itemName, "add")
+
+		-- Проверить, что данные сохранены
+		local savedInventory = self:getByPlayerId(userId)
+		local equippedItem = savedInventory:getEquippedItem(slot)
+		self.logger:info("InventoryRepository", "Verification: equipped item in slot", slot:getName(), "is", equippedItem or "none")
+	else
+		self.logger:error("InventoryRepository", "Failed to equip item in inventory entity")
 	end
 
 	return success
@@ -389,31 +416,3 @@ end
 
 return InventoryRepository
 
--- Пример новой структуры данных Accessories в metaPlayer.Data.Inventory.Accessories
--- Теперь данные хранятся в виде массива предметов с флагом equipped
--- Все предметы в массиве принадлежат игроку (owned = true по умолчанию)
--- local Accessories = {
--- 	{
--- 		name = "Amulet_1",
--- 		type = "amulet",
--- 		level = 1,
--- 		equipped = true
--- 	},
--- 	{
--- 		name = "Amulet_1", -- второй экземпляр того же предмета
--- 		type = "amulet",
--- 		level = 1,
--- 		equipped = false
--- 	},
--- 	{
--- 		name = "Fruit_1",
--- 		type = "fruit",
--- 		equipped = false
--- 	},
--- 	{
--- 		name = "Ring_1",
--- 		type = "ring",
--- 		level = 1,
--- 		equipped = false
--- 	}
--- }

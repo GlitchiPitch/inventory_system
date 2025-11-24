@@ -30,7 +30,8 @@ function Services:_registerServices()
 	self.diContainer:singleton("InventoryRemoteService", function(container)
 		local remoteEventService = container:resolve("RemoteEventService")
 		local inventoryService = container:resolve("InventoryService")
-		return InventoryRemoteService.new(remoteEventService, inventoryService)
+		local logger = container:resolve("Logger")
+		return InventoryRemoteService.new(remoteEventService, inventoryService, logger)
 	end)
 end
 

@@ -50,11 +50,20 @@ return Shared
             <string name="Name">Data</string>
             <string name="Source">local AmuletsList = require(script.AmuletsList)
 local FruitsList = require(script.FruitsList)
+local RingsList = require(script.RingsList)
+
+local BonusIcons = {
+    Energy = "rbxassetid://95399152641597",
+    Damage = "rbxassetid://120524693255496",
+    Gems = "rbxassetid://124904701085442",
+}
 
 ---@class InventorySystemData
 local Data = {
     AmuletsList = AmuletsList,
     FruitsList = FruitsList,
+    RingsList = RingsList,
+    BonusIcons = BonusIcons,
 }
 
 return Data</string>
@@ -62,28 +71,31 @@ return Data</string>
           <Item class="ModuleScript" referent="4">
             <Properties>
               <string name="Name">AmuletsList</string>
-              <string name="Source">---@class AmuletsList
-local AmuletsList = {
-    ["Amulet of Strength"] = "0",
-    ["Amulet of Dexterity"] = "1",
-    ["Amulet of Intelligence"] = "2",
-    ["Amulet of Wisdom"] = "3",
-    ["Amulet of Charisma"] = "4",
-    ["Amulet of Constitution"] = "5",
-    ["Amulet of Luck"] = "6",
+              <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SharedModules = ReplicatedStorage.SharedModules
+local AmuletsModule = require(SharedModules.Amulets)
 
-    
-    ["Earth Stone"] =  "1",
-    ["Fire Crystal"] =  "2",
-    ["Ice Shard"] =  "3",
-    ["Light Essence"] =  "4",
-    ["Lightning Orb"] =  "5",
-    ["Shadow Gem"] =  "6",
-    ["Wind Feather"] =  "7",
+---@class AmuletsList
+local AmuletsList = {
+	["Earth Stone"] = {
+		icon = AmuletsModule["Earth Stone"].Icon,
+		bonusType = AmuletsModule["Earth Stone"].BonusType,
+		bonusValue = AmuletsModule["Earth Stone"].BonusSize,
+	},
+	["Fire Crystal"] = {
+		icon = AmuletsModule["Fire Crystal"].Icon,
+		bonusType = AmuletsModule["Fire Crystal"].BonusType,
+		bonusValue = AmuletsModule["Fire Crystal"].BonusSize,
+	},
+	["Ice Shard"] = {
+		icon = AmuletsModule["Ice Shard"].Icon,
+		bonusType = AmuletsModule["Ice Shard"].BonusType,
+		bonusValue = AmuletsModule["Ice Shard"].BonusSize,
+	},
 }
 
-
-return AmuletsList</string>
+return AmuletsList
+]]></string>
             </Properties>
           </Item>
           <Item class="ModuleScript" referent="5">
@@ -96,21 +108,82 @@ local FruitsModule = require(SharedModules.Fruits)
 ---@class FruitsList
 local FruitsList = {
 
-	["Bari Fruit"] = FruitsModule["Bari Fruit"].Icon,
-	["Gomu Fruit"] = FruitsModule["Gomu Fruit"].Icon,
-	["Ice Fruit"] = FruitsModule["Ice Fruit"].Icon,
-	["Love Fruit"] = FruitsModule["Love Fruit"].Icon,
-	["Magma Fruit"] = FruitsModule["Magma Fruit"].Icon,
-	["Phoenix Fruit"] = FruitsModule["Phoenix Fruit"].Icon,
-	["Quake Fruit"] = FruitsModule["Quake Fruit"].Icon,
-	["Rumble Fruit"] = FruitsModule["Rumble Fruit"].Icon,
+	["Bari Fruit"] = {
+		icon = FruitsModule["Bari Fruit"].Icon,
+		bonusType = FruitsModule["Bari Fruit"].BonusType,
+		bonusValue = FruitsModule["Bari Fruit"].BonusSize,
+	},
+	["Gomu Fruit"] = {
+		icon = FruitsModule["Gomu Fruit"].Icon,
+		bonusType = FruitsModule["Gomu Fruit"].BonusType,
+		bonusValue = FruitsModule["Gomu Fruit"].BonusSize,
+	},
+	["Ice Fruit"] = {
+		icon = FruitsModule["Ice Fruit"].Icon,
+		bonusType = FruitsModule["Ice Fruit"].BonusType,
+		bonusValue = FruitsModule["Ice Fruit"].BonusSize,
+	},
+	["Love Fruit"] = {
+		icon = FruitsModule["Love Fruit"].Icon,
+		bonusType = FruitsModule["Love Fruit"].BonusType,
+		bonusValue = FruitsModule["Love Fruit"].BonusSize,
+	},
+	["Magma Fruit"] = {
+		icon = FruitsModule["Magma Fruit"].Icon,
+		bonusType = FruitsModule["Magma Fruit"].BonusType,
+		bonusValue = FruitsModule["Magma Fruit"].BonusSize,
+	},
+	["Phoenix Fruit"] = {
+		icon = FruitsModule["Phoenix Fruit"].Icon,
+		bonusType = FruitsModule["Phoenix Fruit"].BonusType,
+		bonusValue = FruitsModule["Phoenix Fruit"].BonusSize,
+	},
+	["Quake Fruit"] = {
+		icon = FruitsModule["Quake Fruit"].Icon,
+		bonusType = FruitsModule["Quake Fruit"].BonusType,
+		bonusValue = FruitsModule["Quake Fruit"].BonusSize,
+	},
+	["Rumble Fruit"] = {
+		icon = FruitsModule["Rumble Fruit"].Icon,
+		bonusType = FruitsModule["Rumble Fruit"].BonusType,
+		bonusValue = FruitsModule["Rumble Fruit"].BonusSize,
+	},
 }
 
 return FruitsList</string>
             </Properties>
           </Item>
+          <Item class="ModuleScript" referent="6">
+            <Properties>
+              <string name="Name">RingsList</string>
+              <string name="Source">local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SharedModules = ReplicatedStorage.SharedModules
+local RingsModule = require(SharedModules.Rings)
+
+---@class RingsList
+local RingsList = {
+    ["Lightning Orb"] = {
+        icon = RingsModule["Lightning Orb"].Icon,
+        bonusType = RingsModule["Lightning Orb"].BonusType,
+        bonusValue = RingsModule["Lightning Orb"].BonusSize,
+    },
+    ["Shadow Gem"] = {
+        icon = RingsModule["Shadow Gem"].Icon,
+        bonusType = RingsModule["Shadow Gem"].BonusType,
+        bonusValue = RingsModule["Shadow Gem"].BonusSize,
+    },
+    ["Wind Feather"] = {
+        icon = RingsModule["Wind Feather"].Icon,
+        bonusType = RingsModule["Wind Feather"].BonusType,
+        bonusValue = RingsModule["Wind Feather"].BonusSize,
+    },
+}
+
+return RingsList</string>
+            </Properties>
+          </Item>
         </Item>
-        <Item class="ModuleScript" referent="6">
+        <Item class="ModuleScript" referent="7">
           <Properties>
             <string name="Name">Domain</string>
             <string name="Source">local Entities = require(script.Entities)
@@ -128,7 +201,7 @@ end
 
 return Domain</string>
           </Properties>
-          <Item class="ModuleScript" referent="7">
+          <Item class="ModuleScript" referent="8">
             <Properties>
               <string name="Name">Entities</string>
               <string name="Source"><![CDATA[---@class InventorySystemEntities
@@ -160,7 +233,7 @@ end
 return Entities
 ]]></string>
             </Properties>
-            <Item class="ModuleScript" referent="8">
+            <Item class="ModuleScript" referent="9">
               <Properties>
                 <string name="Name">EquipmentSlot</string>
                 <string name="Source"><![CDATA[---@class EquipmentSlotEntity   
@@ -220,19 +293,19 @@ end
 EquipmentSlotEntity.LEFT_HAND = EquipmentSlotEntity.new(
     EquipmentSlotEntity.SlotName.LEFT_HAND,
     "Left Hand",
-    {"weapon"}
+    {"weapon", "ring"}
 )
 
 EquipmentSlotEntity.RIGHT_HAND = EquipmentSlotEntity.new(
     EquipmentSlotEntity.SlotName.RIGHT_HAND,
     "Right Hand",
-    {"weapon"}
+    {"weapon", "ring"}
 )
 
 EquipmentSlotEntity.HELMET = EquipmentSlotEntity.new(
     EquipmentSlotEntity.SlotName.HELMET,
     "Helmet",
-    {"weapon"} -- В этой игре шлем заменен на меч
+    {"amulet"}
 )
 
 ---@param slotName string
@@ -251,8 +324,8 @@ end
 ---@return table
 function EquipmentSlotEntity.getAllSlots()
     return {
-        EquipmentSlotEntity.LEFT_HAND,
         EquipmentSlotEntity.RIGHT_HAND,
+        EquipmentSlotEntity.LEFT_HAND,
         EquipmentSlotEntity.HELMET
     }
 end
@@ -261,7 +334,7 @@ return EquipmentSlotEntity
 ]]></string>
               </Properties>
             </Item>
-            <Item class="ModuleScript" referent="9">
+            <Item class="ModuleScript" referent="10">
               <Properties>
                 <string name="Name">Inventory</string>
                 <string name="Source"><![CDATA[---@class InventoryEntity
@@ -301,10 +374,8 @@ end
 ---@param itemId string
 ---@return number
 function InventoryEntity:getItemCount(itemId)
-	for slotName, slot in pairs(self.inventorySlots) do
-		if slotName == itemId then
-			return slot.count
-		end
+	if self.inventorySlots[itemId] then
+		return #self.inventorySlots[itemId]
 	end
 	return 0
 end
@@ -323,27 +394,35 @@ function InventoryEntity:addItem(itemId, count)
 		return false
 	end
 
-	-- Найти существующий слот с этим предметом
-	for _, slot in ipairs(self.inventorySlots) do
-		if slot.id == itemId then
-			slot.count = slot.count + count
-			return true
-		end
-	end
+	-- Проверить лимит инвентаря (количество всех слотов)
+	local currentSlotsUsed = self:getTotalSlotsUsed()
 
-	-- Проверить, не превысит ли добавление нового слота лимит
-	if #self.inventorySlots >= self.maxSlots then
+	-- Проверить, не превысит ли добавление новых слотов лимит
+	if currentSlotsUsed + count > self.maxSlots then
 		return false -- Инвентарь полон
 	end
 
-	-- Создать новый слот
-	table.insert(self.inventorySlots, { id = itemId, count = count })
+	-- Инициализировать массив слотов для этого предмета, если его нет
+	if not self.inventorySlots[itemId] then
+		self.inventorySlots[itemId] = {}
+	end
+
+	-- Добавить count отдельных слотов для этого предмета
+	for i = 1, count do
+		local slotId = itemId .. "_" .. (#self.inventorySlots[itemId] + 1)
+		table.insert(self.inventorySlots[itemId], { id = itemId, slotId = slotId })
+	end
+
 	return true
 end
 
 ---@return number
 function InventoryEntity:getTotalSlotsUsed()
-	return #self.inventorySlots
+	local totalSlots = 0
+	for _, itemSlots in pairs(self.inventorySlots) do
+		totalSlots = totalSlots + #itemSlots
+	end
+	return totalSlots
 end
 
 ---@return number
@@ -364,46 +443,77 @@ function InventoryEntity:removeItem(itemId, count)
 		return false
 	end
 
-	for i, slot in ipairs(self.inventorySlots) do
-		if slot.id == itemId then
-			if slot.count >= count then
-				slot.count = slot.count - count
-				if slot.count == 0 then
-					table.remove(self.inventorySlots, i)
-				end
-				return true
-			end
-			return false -- Недостаточно предметов
-		end
+	local itemSlots = self.inventorySlots[itemId]
+	if not itemSlots or #itemSlots < count then
+		return false -- Недостаточно предметов
 	end
-	return false -- Предмет не найден
+
+	-- Удалить count слотов с конца массива
+	for i = 1, count do
+		table.remove(itemSlots)
+	end
+
+	-- Если слотов не осталось, удалить запись полностью
+	if #itemSlots == 0 then
+		self.inventorySlots[itemId] = nil
+	end
+
+	return true
 end
 
----@param itemId string
+---@param slotId string
 ---@param slot EquipmentSlotEntity
 ---@return boolean
-function InventoryEntity:equipItem(itemId, slot)
+function InventoryEntity:equipItem(slotId, slot)
+	-- Извлечь itemName из slotId (убираем "_номер")
+	local itemName = string.match(slotId, "^(.+)_%d+$")
+	if not itemName then
+		return false
+	end
+
 	-- Проверить, есть ли предмет в инвентаре
-	if not self:hasItem(itemId) then
+	if not self:hasItem(itemName) then
+		return false
+	end
+
+	-- Проверить, что slotId действительно существует в inventorySlots
+	local slotExists = false
+	if self.inventorySlots[itemName] then
+		for _, slotData in ipairs(self.inventorySlots[itemName]) do
+			if slotData.slotId == slotId then
+				slotExists = true
+				break
+			end
+		end
+	end
+	if not slotExists then
 		return false
 	end
 
 	-- Снять текущий предмет из слота, если есть
 	local currentEquipped = self:getEquippedItem(slot)
 	if currentEquipped then
+		print("InventoryEntity: Unequipping existing item", currentEquipped, "from slot", slot:getName())
 		self:unequipItem(slot)
 	end
 
 	-- Экипировать новый предмет
-	self.equippedItems[slot:getName()] = itemId
+	print("InventoryEntity: Equipping item", slotId, "in slot", slot:getName())
+	self.equippedItems[slot:getName()] = slotId
 	return true
 end
 
 ---@param slot EquipmentSlotEntity
----@return boolean
+---@return boolean, string?
 function InventoryEntity:unequipItem(slot)
-	local equippedItem = self:getEquippedItem(slot)
-	if not equippedItem then
+	local equippedSlotId = self:getEquippedItem(slot)
+	if not equippedSlotId then
+		return false
+	end
+
+	-- Извлечь itemName из slotId
+	local itemName = string.match(equippedSlotId, "^(.+)_%d+$")
+	if not itemName then
 		return false
 	end
 
@@ -411,11 +521,11 @@ function InventoryEntity:unequipItem(slot)
 	self.equippedItems[slot:getName()] = nil
 
 	-- Вернуть предмет в инвентарь (если его там нет)
-	if not self:hasItem(equippedItem) then
-		self:addItem(equippedItem, 1)
+	if not self:hasItem(itemName) then
+		self:addItem(itemName, 1)
 	end
 
-	return true, equippedItem
+	return true, equippedSlotId
 end
 
 ---@return table
@@ -439,7 +549,7 @@ return InventoryEntity
 ]]></string>
               </Properties>
             </Item>
-            <Item class="ModuleScript" referent="10">
+            <Item class="ModuleScript" referent="11">
               <Properties>
                 <string name="Name">Item</string>
                 <string name="Source"><![CDATA[---@class ItemEntity
@@ -459,6 +569,8 @@ ItemEntity.ItemType = {
 	ARMOR = "armor",
 	CONSUMABLE = "consumable",
 	MATERIAL = "material",
+	RING = "ring",
+	AMULET = "amulet",
 }
 
 ---@enum ItemRarity
@@ -507,7 +619,7 @@ return ItemEntity
 ]]></string>
               </Properties>
             </Item>
-            <Item class="ModuleScript" referent="11">
+            <Item class="ModuleScript" referent="12">
               <Properties>
                 <string name="Name">Player</string>
                 <string name="Source"><![CDATA[---@class PlayerEntity
@@ -590,7 +702,7 @@ return PlayerEntity
             </Item>
           </Item>
         </Item>
-        <Item class="ModuleScript" referent="12">
+        <Item class="ModuleScript" referent="13">
           <Properties>
             <string name="Name">Infrastructure</string>
             <string name="Source"><![CDATA[local DIContainer = require(script.DIContainer)
@@ -618,7 +730,7 @@ end
 return Infrastructure
 ]]></string>
           </Properties>
-          <Item class="ModuleScript" referent="13">
+          <Item class="ModuleScript" referent="14">
             <Properties>
               <string name="Name">DIContainer</string>
               <string name="Source"><![CDATA[---@class service
@@ -711,12 +823,12 @@ return DIContainer
 ]]></string>
             </Properties>
           </Item>
-          <Item class="RemoteEvent" referent="14">
+          <Item class="RemoteEvent" referent="15">
             <Properties>
               <string name="Name">RemoteEvent</string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="15">
+          <Item class="ModuleScript" referent="16">
             <Properties>
               <string name="Name">Services</string>
               <string name="Source"><![CDATA[local RemoteEventService = require(script.RemoteEventService)
@@ -741,8 +853,9 @@ function Services.new(diContainer, remoteEvent)
 end
 
 function Services:_registerServices()
-	self.diContainer:singleton("RemoteEventService", function()
-		return RemoteEventService.new(self.remoteEvent)
+	self.diContainer:singleton("RemoteEventService", function(container)
+		local logger = container:resolve("Logger")
+		return RemoteEventService.new(self.remoteEvent, logger)
 	end)
 
 	-- Регистрируем LoggerService
@@ -761,7 +874,7 @@ end
 return Services
 ]]></string>
             </Properties>
-            <Item class="ModuleScript" referent="16">
+            <Item class="ModuleScript" referent="17">
               <Properties>
                 <string name="Name">FeatureFlagService</string>
                 <string name="Source"><![CDATA[local RunService = game:GetService("RunService")
@@ -843,7 +956,7 @@ return FeatureFlagService
 ]]></string>
               </Properties>
             </Item>
-            <Item class="ModuleScript" referent="17">
+            <Item class="ModuleScript" referent="18">
               <Properties>
                 <string name="Name">LoggerService</string>
                 <string name="Source"><![CDATA[local RunService = game:GetService("RunService")
@@ -1038,7 +1151,7 @@ return LoggerService
 ]]></string>
               </Properties>
             </Item>
-            <Item class="ModuleScript" referent="18">
+            <Item class="ModuleScript" referent="19">
               <Properties>
                 <string name="Name">RemoteEventService</string>
                 <string name="Source"><![CDATA[local RunService = game:GetService("RunService")
@@ -1049,12 +1162,14 @@ local RemoteEventService = {}
 RemoteEventService.__index = RemoteEventService
 
 ---@param remoteEvent RemoteEvent
+---@param logger LoggerService
 ---@return RemoteEventService
-function RemoteEventService.new(remoteEvent)
+function RemoteEventService.new(remoteEvent, logger)
 	local self = setmetatable({}, RemoteEventService)
 	self._isServer = RunService:IsServer()
 	self.remoteEvent = remoteEvent
 	self._connections = {}
+	self.logger = logger
 
 	return self
 end
@@ -1062,15 +1177,18 @@ end
 ---@param event string
 ---@param callback fun(...) -> ()
 function RemoteEventService:connectToEvent(event, callback)
+	self.logger:debug("RemoteEventService", "Connecting to event:", event)
 	if self._isServer then
 		self._connections[event] = self.remoteEvent.OnServerEvent:Connect(function(player, _event, args)
 			if event == _event then
+				self.logger:debug("RemoteEventService", "Received server event:", event, "from player:", player.Name)
 				callback(player, args)
 			end
 		end)
 	else
 		self._connections[event] = self.remoteEvent.OnClientEvent:Connect(function(_event, args)
 			if event == _event then
+				self.logger:debug("RemoteEventService", "Received client event:", event)
 				callback(args)
 			end
 		end)
@@ -1086,6 +1204,7 @@ end
 ---@param event string
 ---@param args any[]
 function RemoteEventService:fireServer(event, args)
+	self.logger:debug("RemoteEventService", "Firing server event:", event)
 	self.remoteEvent:FireServer(event, args)
 end
 
@@ -1093,12 +1212,14 @@ end
 ---@param player Player
 ---@param args any[]
 function RemoteEventService:fireClient(player, event, args)
+	self.logger:debug("RemoteEventService", "Firing client event:", event, "to player:", player.Name)
 	self.remoteEvent:FireClient(player, event, args)
 end
 
 ---@param event string
 ---@param args any[]
 function RemoteEventService:fireAll(event, args)
+	self.logger:debug("RemoteEventService", "Firing event to all clients:", event)
 	self.remoteEvent:FireAllClients(event, args)
 end
 
@@ -1111,19 +1232,19 @@ return RemoteEventService
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="19">
+  <Item class="ServerScriptService" referent="20">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="ModuleScript" referent="20">
+    <Item class="ModuleScript" referent="21">
       <Properties>
         <string name="Name">MetaService</string>
       </Properties>
-      <Item class="Folder" referent="21">
+      <Item class="Folder" referent="22">
         <Properties>
           <string name="Name">Server</string>
         </Properties>
-        <Item class="ModuleScript" referent="22">
+        <Item class="ModuleScript" referent="23">
           <Properties>
             <string name="Name">InventorySystemServer</string>
             <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -1157,7 +1278,7 @@ server:init()
 return Server
 ]]></string>
           </Properties>
-          <Item class="ModuleScript" referent="23">
+          <Item class="ModuleScript" referent="24">
             <Properties>
               <string name="Name">Infrastructure</string>
               <string name="Source">local Repositories = require(script.Repositories)
@@ -1182,7 +1303,7 @@ end
 
 return Infrastructure</string>
             </Properties>
-            <Item class="ModuleScript" referent="24">
+            <Item class="ModuleScript" referent="25">
               <Properties>
                 <string name="Name">Repositories</string>
                 <string name="Source"><![CDATA[local DataStorePlayerRepository = require(script.DataStorePlayerRepository)
@@ -1211,7 +1332,10 @@ function ServerInfrastructureRepositories:init()
 		local domain = container:resolve("Shared.Domain")
 
 		local InventoryEntity = domain.entities.Inventory
-		return InventoryRepository.new(logger, InventoryEntity)
+		local amuletsList = container:resolve("Shared.Data").AmuletsList
+		local fruitsList = container:resolve("Shared.Data").FruitsList
+		local ringsList = container:resolve("Shared.Data").RingsList
+		return InventoryRepository.new(logger, InventoryEntity, amuletsList, fruitsList, ringsList)
 	end)
 
 	self.diContainer:singleton("PlayerRepository", function(container)
@@ -1234,7 +1358,7 @@ end
 return ServerInfrastructureRepositories
 ]]></string>
               </Properties>
-              <Item class="ModuleScript" referent="25">
+              <Item class="ModuleScript" referent="26">
                 <Properties>
                   <string name="Name">DataStorePlayerRepository</string>
                   <string name="Source"><![CDATA[local ServerScriptService = game:GetService("ServerScriptService")
@@ -1356,7 +1480,7 @@ return DataStorePlayerRepository
 ]]></string>
                 </Properties>
               </Item>
-              <Item class="ModuleScript" referent="26">
+              <Item class="ModuleScript" referent="27">
                 <Properties>
                   <string name="Name">InventoryRepository</string>
                   <string name="Source"><![CDATA[local ServerScriptService = game:GetService("ServerScriptService")
@@ -1367,72 +1491,232 @@ local Players = game:GetService("Players")
 ---@field logger Logger
 ---@field _cache table<string, InventoryEntity>
 ---@field InventoryEntity InventoryEntity
+---@field amuletsList table<string, string>
+---@field fruitsList table<string, string>
+---@field ringsList table<string, string>
 local InventoryRepository = {}
 InventoryRepository.__index = InventoryRepository
 
 ---@param logger Logger
 ---@param InventoryEntity InventoryEntity
+---@param amuletsList table<string, string>
+---@param fruitsList table<string, string>
+---@param ringsList table<string, string>
 ---@return InventoryRepository
-function InventoryRepository.new(logger, InventoryEntity)
+function InventoryRepository.new(logger, InventoryEntity, amuletsList, fruitsList, ringsList)
 	local self = setmetatable({}, InventoryRepository)
 	self.logger = logger
 	self.InventoryEntity = InventoryEntity
+	self.amuletsList = amuletsList or {}
+	self.fruitsList = fruitsList or {}
+	self.ringsList = ringsList or {}
 	self._cache = {}
 	return self
 end
 
 ---@param userId string
----@return InventoryEntity?
-function InventoryRepository:getByPlayerId(userId)
-	-- Проверить кэш
-	if self._cache[userId] then
-		return self._cache[userId]
-	end
-
-	-- Получить объект игрока
+---@return any?
+function InventoryRepository:_getMetaPlayer(userId)
 	local playerInstance = Players:GetPlayerByUserId(tonumber(userId))
 	if not playerInstance then
 		return nil
 	end
 
 	local metaPlayer = MetaService.Class.Player:Get(playerInstance)
+	return metaPlayer
+end
+
+---@param value any
+---@return number
+function InventoryRepository:_validateNumber(value)
+	if type(value) == "number" then
+		return value
+	elseif type(value) == "boolean" then
+		return value and 1 or 0
+	else
+		return 0
+	end
+end
+
+---@param item table
+---@return string?
+function InventoryRepository:_getSlotNameForItem(item)
+	local itemType = self:_getItemType(item.name)
+	if itemType == "ring" then
+		-- Для колец используем правую руку по умолчанию (как в клиенте)
+		self.logger:debug("InventoryRepository", "Assigning rightHand slot for ring item:", item.name)
+		return "rightHand"
+	elseif itemType == "amulet" then
+		-- Для амулетов используем шлем
+		self.logger:debug("InventoryRepository", "Assigning helmet slot for amulet item:", item.name)
+		return "helmet"
+	else
+		self.logger:debug("InventoryRepository", "No slot assigned for item:", item.name, "type:", itemType)
+		return nil -- Для фруктов и других предметов слоты могут не быть нужны
+	end
+end
+
+---@param itemName string
+---@return string
+function InventoryRepository:_getItemType(itemName)
+	if self:checkIsAmulet(itemName) then
+		return "amulet"
+	elseif self:checkIsFruit(itemName) then
+		return "fruit"
+	elseif self:checkIsRing(itemName) then
+		return "ring"
+	else
+		return "unknown"
+	end
+end
+
+---@param accessories table
+---@param itemName string
+---@param instanceIndex number
+---@return table?
+function InventoryRepository:_findExistingItem(accessories, itemName, instanceIndex)
+	local count = 0
+	for _, item in ipairs(accessories) do
+		if item.name == itemName then
+			count = count + 1
+			if count == instanceIndex then
+				return item
+			end
+		end
+	end
+	return nil
+end
+
+---@param userId string
+---@param itemName string
+---@param action string
+function InventoryRepository:_handleEquippedItemLogic(userId, itemName, action)
+	if not itemName then
+		return
+	end
+
+	local metaPlayer = self:_getMetaPlayer(userId)
+	if not metaPlayer then
+		return
+	end
+
+	local accessories = metaPlayer.Data.Inventory.Accessories
+	if not accessories or type(accessories) ~= "table" then
+		return
+	end
+
+	-- Проверить, что предмет может быть экипирован (кольцо или амулет)
+	local isEquipable = self:checkItemType("ring", itemName) or self:checkItemType("amulet", itemName)
+	if not isEquipable then
+		return
+	end
+
+	-- Найти первый предмет с данным именем и установить/снять флаг equipped
+	for _, item in ipairs(accessories) do
+		if item.name == itemName then
+			item.equipped = (action == "add")
+			break -- Меняем только первый найденный предмет
+		end
+	end
+end
+
+---@param itemType string
+---@param itemName string
+---@return boolean
+function InventoryRepository:checkItemType(itemType, itemName)
+	local typeLists = {
+		amulet = self.amuletsList,
+		fruit = self.fruitsList,
+		ring = self.ringsList
+	}
+	return typeLists[itemType] and typeLists[itemType][itemName] ~= nil
+end
+
+---@param itemName string
+---@return boolean
+function InventoryRepository:checkIsAmulet(itemName)
+	return self:checkItemType("amulet", itemName)
+end
+
+---@param itemName string
+---@return boolean
+function InventoryRepository:checkIsFruit(itemName)
+	return self:checkItemType("fruit", itemName)
+end
+
+---@param itemName string
+---@return boolean
+function InventoryRepository:checkIsRing(itemName)
+	return self:checkItemType("ring", itemName)
+end
+
+---@param userId string
+---@return InventoryEntity?
+function InventoryRepository:getByPlayerId(userId)
+	-- Проверить кэш
+	-- if self._cache[userId] then
+	-- 	return self._cache[userId]
+	-- end
+
+	local metaPlayer = self:_getMetaPlayer(userId)
 	if not metaPlayer then
 		return nil
 	end
 
 	-- Получить данные инвентаря
-	local inventoryData = metaPlayer.Data.Inventory
-	if not inventoryData then
+	local accessoriesData = metaPlayer.Data.Inventory.Accessories
+	if not accessoriesData or type(accessoriesData) ~= "table" then
 		return nil
 	end
 
 	-- Создать объект Inventory из данных
-	-- Преобразовать Amulets из формата {name: count} в [{id: name, count: count}]
-	local amuletsData = inventoryData["Amulets"] or {}
+	-- Преобразовать массив предметов в inventorySlots и equippedItems
+
 	local inventorySlots = {}
-	for name, count in pairs(amuletsData) do
-		inventorySlots[name] = {
-			id = name,
-			count = count,
-		}
-	end
+	local equippedItems = {}
 
-	local fruitsData = inventoryData["Fruits"] or {}
+	-- Группировать предметы по имени для подсчета количества
+	local itemCounts = {}
 
-	for name, count in pairs(fruitsData) do
-		inventorySlots[name] = {
-			id = name,
-			count = count,
-		}
+	for _, item in ipairs(accessoriesData) do
+		-- Все предметы в массиве принадлежат игроку
+		itemCounts[item.name] = (itemCounts[item.name] or 0) + 1
+		if item.equipped then
+			-- Использовать сохраненный slotId или slotName
+			local slotName = item.slotName or self:_getSlotNameForItem(item)
+			if slotName then
+				if item.slotId then
+					-- У нас есть конкретный slotId
+					equippedItems[slotName] = item.slotId
+					self.logger:debug("InventoryRepository", "Loading equipped item:", item.name, "slotId:", item.slotId, "in slot:", slotName)
+				else
+					-- Fallback: определить slotId на основе типа предмета
+					equippedItems[slotName] = item.name .. "_1"
+					self.logger:debug("InventoryRepository", "Loading equipped item (fallback):", item.name, "in slot:", slotName, "slotId:", item.name .. "_1")
+				end
+			end
+		end
+
+		-- Создать inventorySlots на основе подсчитанных предметов
+		for itemName, count in pairs(itemCounts) do
+			local validatedCount = self:_validateNumber(count)
+			if validatedCount > 0 then
+				inventorySlots[itemName] = {}
+				for i = 1, validatedCount do
+					local slotId = itemName .. "_" .. i
+					table.insert(inventorySlots[itemName], { id = itemName, slotId = slotId })
+				end
+			end
+		end
 	end
 
 	local inventory = self.InventoryEntity.fromDataStructure({
-		equippedItems = inventoryData.EquippedAccessories or {},
+		equippedItems = equippedItems,
 		inventorySlots = inventorySlots,
 	})
 
 	-- Добавить в кэш
-	self._cache[userId] = inventory
+	-- self._cache[userId] = inventory
 
 	return inventory
 end
@@ -1443,19 +1727,76 @@ function InventoryRepository:save(userId, inventory)
 	-- Обновить кэш
 	self._cache[userId] = inventory
 
-	-- Получить объект игрока
-	local playerInstance = Players:GetPlayerByUserId(tonumber(userId))
-	if not playerInstance then
-		return
-	end
-
-	local metaPlayer = MetaService.Class.Player:Get(playerInstance)
+	local metaPlayer = self:_getMetaPlayer(userId)
 	if not metaPlayer then
 		return
 	end
 
-	-- Сохранить данные инвентаря
-	metaPlayer.Data.Inventory["EquippedAccessories"] = inventory:toDataStructure().equippedItems
+	-- Получить текущий массив предметов или создать новый
+	local currentAccessories = metaPlayer.Data.Inventory.Accessories
+	if not currentAccessories or type(currentAccessories) ~= "table" then
+		currentAccessories = {}
+	end
+
+	local data = inventory:toDataStructure()
+
+	-- Создать словарь equipped предметов для быстрого поиска (по slotId)
+	local equippedItemsMap = {}
+	for slotName, slotId in pairs(data.equippedItems) do
+		equippedItemsMap[slotId] = {
+			slotName = slotName,
+			slotId = slotId
+		}
+		self.logger:debug("InventoryRepository", "Preparing to save equipped item:", slotId, "in slot:", slotName)
+	end
+
+	-- Создать словарь предметов в инвентаре с их количеством
+	local inventoryItemsMap = {}
+	for itemName, itemSlots in pairs(data.inventorySlots) do
+		local count = self:_validateNumber(#itemSlots)
+		if count > 0 then
+			inventoryItemsMap[itemName] = count
+		end
+	end
+
+	-- Обновить массив Accessories
+	local newAccessories = {}
+
+	-- Добавить предметы из инвентаря
+	for itemName, count in pairs(inventoryItemsMap) do
+		local itemType = self:_getItemType(itemName)
+
+		-- Для каждого экземпляра предмета добавить отдельный элемент
+		for i = 1, count do
+			local slotId = itemName .. "_" .. i
+			local equippedInfo = equippedItemsMap[slotId]
+			local isEquipped = equippedInfo ~= nil
+
+			local itemData = {
+				name = itemName,
+				type = itemType,
+				equipped = isEquipped
+			}
+
+			-- Добавить slotName и slotId для экипированных предметов
+			if isEquipped then
+				itemData.slotName = equippedInfo.slotName
+				itemData.slotId = equippedInfo.slotId
+				self.logger:debug("InventoryRepository", "Saving equipped item:", itemName, "slotId:", slotId, "slotName:", equippedInfo.slotName)
+			end
+
+			-- Добавить level если есть в существующих данных
+			local existingItem = self:_findExistingItem(currentAccessories, itemName, i)
+			if existingItem and existingItem.level then
+				itemData.level = existingItem.level
+			end
+
+			table.insert(newAccessories, itemData)
+		end
+	end
+
+	-- Сохранить обновленный массив
+	metaPlayer.Data.Inventory.Accessories = newAccessories
 end
 
 ---@param userId string
@@ -1503,18 +1844,30 @@ function InventoryRepository:removeItemFromPlayer(userId, itemId, count)
 end
 
 ---@param userId string
----@param itemId string
+---@param slotId string
 ---@param slot EquipmentSlotEntity
 ---@return boolean
-function InventoryRepository:equipItem(userId, itemId, slot)
+function InventoryRepository:equipItem(userId, slotId, slot)
 	local inventory = self:getByPlayerId(userId)
 	if not inventory then
 		return false
 	end
 
-	local success = inventory:equipItem(itemId, slot)
+	local success = inventory:equipItem(slotId, slot)
 	if success then
+		self.logger:info("InventoryRepository", "Equipping item", slotId, "in slot", slot:getName(), "- saving inventory")
 		self:save(userId, inventory)
+
+		-- Извлечь itemName из slotId для дополнительной логики
+		local itemName = string.match(slotId, "^(.+)_%d+$")
+		self:_handleEquippedItemLogic(userId, itemName, "add")
+
+		-- Проверить, что данные сохранены
+		local savedInventory = self:getByPlayerId(userId)
+		local equippedItem = savedInventory:getEquippedItem(slot)
+		self.logger:info("InventoryRepository", "Verification: equipped item in slot", slot:getName(), "is", equippedItem or "none")
+	else
+		self.logger:error("InventoryRepository", "Failed to equip item in inventory entity")
 	end
 
 	return success
@@ -1522,19 +1875,23 @@ end
 
 ---@param userId string
 ---@param slot EquipmentSlotEntity
----@return boolean
+---@return boolean, string?
 function InventoryRepository:unequipItem(userId, slot)
 	local inventory = self:getByPlayerId(userId)
 	if not inventory then
 		return false
 	end
 
-	local success, unequippedItem = inventory:unequipItem(slot)
+	local success, unequippedSlotId = inventory:unequipItem(slot)
 	if success then
 		self:save(userId, inventory)
+
+		-- Извлечь itemName из unequippedSlotId для дополнительной логики
+		local unequippedItemName = unequippedSlotId and string.match(unequippedSlotId, "^(.+)_%d+$")
+		self:_handleEquippedItemLogic(userId, unequippedItemName, "remove")
 	end
 
-	return success, unequippedItem
+	return success, unequippedSlotId
 end
 
 ---@param userId string
@@ -1543,11 +1900,12 @@ function InventoryRepository:clearCache(userId)
 end
 
 return InventoryRepository
+
 ]]></string>
                 </Properties>
               </Item>
             </Item>
-            <Item class="ModuleScript" referent="27">
+            <Item class="ModuleScript" referent="28">
               <Properties>
                 <string name="Name">Services</string>
                 <string name="Source"><![CDATA[local InventoryService = require(script.InventoryService)
@@ -1569,18 +1927,21 @@ end
 function Services:_registerServices()
 	-- Регистрация InventoryService
 	self.diContainer:singleton("InventoryService", function(container)
+		local logger = container:resolve("Logger")
 		local inventoryRepository = container:resolve("InventoryRepository")
 		local amuletsList = container:resolve("Shared.Data").AmuletsList
+		local ringsList = container:resolve("Shared.Data").RingsList
 		local fruitsList = container:resolve("Shared.Data").FruitsList
 		local equipmentSlot = container:resolve("Shared.Domain").entities.EquipmentSlot
-		return InventoryService.new(inventoryRepository, amuletsList, fruitsList, equipmentSlot)
+		return InventoryService.new(logger, inventoryRepository, amuletsList, ringsList, fruitsList, equipmentSlot)
 	end)
 
 	-- Регистрация InventoryRemoteService
 	self.diContainer:singleton("InventoryRemoteService", function(container)
 		local remoteEventService = container:resolve("RemoteEventService")
 		local inventoryService = container:resolve("InventoryService")
-		return InventoryRemoteService.new(remoteEventService, inventoryService)
+		local logger = container:resolve("Logger")
+		return InventoryRemoteService.new(remoteEventService, inventoryService, logger)
 	end)
 end
 
@@ -1593,22 +1954,25 @@ end
 return Services
 ]]></string>
               </Properties>
-              <Item class="ModuleScript" referent="28">
+              <Item class="ModuleScript" referent="29">
                 <Properties>
                   <string name="Name">InventoryRemoteService</string>
                   <string name="Source"><![CDATA[---@class InventoryRemoteService
 ---@field remoteEventService RemoteEventService
 ---@field inventoryService InventoryService
+---@field logger Logger
 local InventoryRemoteService = {}
 InventoryRemoteService.__index = InventoryRemoteService
 
 ---@param remoteEventService RemoteEventService
 ---@param inventoryService InventoryService
+---@param logger Logger
 ---@return InventoryRemoteService
-function InventoryRemoteService.new(remoteEventService, inventoryService)
+function InventoryRemoteService.new(remoteEventService, inventoryService, logger)
     local self = setmetatable({}, InventoryRemoteService)
     self.remoteEventService = remoteEventService
     self.inventoryService = inventoryService
+    self.logger = logger
 
     self:setupEventHandlers()
     return self
@@ -1653,8 +2017,10 @@ function InventoryRemoteService:handleGetInventory(player)
 
     if inventory then
         local inventoryData = inventory:toDataStructure()
+        self.logger:info("InventoryRemoteService", "Sending inventory to player", player.Name, "- equippedItems:", inventoryData.equippedItems)
         self.remoteEventService:fireClient(player, "InventoryUpdated", inventoryData)
     else
+        self.logger:error("InventoryRemoteService", "Failed to load inventory for player", player.Name)
         self.remoteEventService:fireClient(player, "Error", {message = "Failed to load inventory"})
     end
 end
@@ -1707,17 +2073,17 @@ end
 ---@param args table
 function InventoryRemoteService:handleEquipItem(player, args)
     local userId = tostring(player.UserId)
-    local itemId = args.itemId
+    local slotId = args.slotId
     local slotName = args.slotName
-    
-    if not itemId or not slotName then
-        self.remoteEventService:fireClient(player, "Error", {message = "ItemId and slotName are required"})
+
+    if not slotId or not slotName then
+        self.remoteEventService:fireClient(player, "Error", {message = "SlotId and slotName are required"})
         return
     end
 
-    local success, errorMessage = self.inventoryService:equipItem(userId, itemId, slotName)
+    local success, errorMessage = self.inventoryService:equipItem(userId, slotId, slotName)
     if success then
-        self.remoteEventService:fireClient(player, "ItemEquipped", {itemId = itemId, slotName = slotName})
+        self.remoteEventService:fireClient(player, "ItemEquipped", {slotId = slotId, slotName = slotName})
         -- Отправить обновленный инвентарь
         self:handleGetInventory(player)
     else
@@ -1731,17 +2097,22 @@ function InventoryRemoteService:handleUnequipItem(player, args)
     local userId = tostring(player.UserId)
     local slotName = args.slotName
 
+    self.logger:info("InventoryRemoteService", "Handling unequip request from player:", player.Name, "slot:", slotName)
+
     if not slotName then
+        self.logger:error("InventoryRemoteService", "SlotName is required for unequip")
         self.remoteEventService:fireClient(player, "Error", {message = "SlotName is required"})
         return
     end
 
     local success, unequippedItem = self.inventoryService:unequipItem(userId, slotName)
     if success then
-        self.remoteEventService:fireClient(player, "ItemUnequipped", {itemId = unequippedItem})
+        self.logger:info("InventoryRemoteService", "Successfully unequipped item:", unequippedItem)
+        self.remoteEventService:fireClient(player, "ItemUnequipped", {slotId = unequippedItem or ""})
         -- Отправить обновленный инвентарь
         self:handleGetInventory(player)
     else
+        self.logger:error("InventoryRemoteService", "Failed to unequip item:", unequippedItem)
         self.remoteEventService:fireClient(player, "Error", {message = unequippedItem or "Failed to unequip item"})
     end
 end
@@ -1750,32 +2121,41 @@ return InventoryRemoteService
 ]]></string>
                 </Properties>
               </Item>
-              <Item class="ModuleScript" referent="29">
+              <Item class="ModuleScript" referent="30">
                 <Properties>
                   <string name="Name">InventoryService</string>
                   <string name="Source"><![CDATA[local MetaService = require(game.ServerScriptService.MetaService)
 
 ---@class InventoryService
+---@field logger Logger
 ---@field inventoryRepository InventoryRepository
 ---@field amuletsList table<string, string>
+---@field ringsList table<string, string>
 ---@field EquipmentSlot EquipmentSlotEntity?
 local InventoryService = {}
 InventoryService.__index = InventoryService
 
+---@param logger Logger
 ---@param inventoryRepository InventoryRepository
 ---@param amuletsList table<string, string>
+---@param ringsList table<string, string>
 ---@param fruitsList table<string, string>
 ---@param EquipmentSlot EquipmentSlotEntity?
 ---@return InventoryService
-function InventoryService.new(inventoryRepository, amuletsList, fruitsList, EquipmentSlot)
+function InventoryService.new(logger, inventoryRepository, amuletsList, ringsList, fruitsList, EquipmentSlot)
 	local self = setmetatable({}, InventoryService)
+	self.logger = logger
 	self.inventoryRepository = inventoryRepository
 	self.amuletsList = amuletsList or {}
+	self.ringsList = ringsList or {}
 	self.fruitsList = fruitsList or {}
 
 	-- Объединяем списки предметов в один словарь для валидации
 	self.allItemIcons = {}
 	for itemName, iconId in pairs(amuletsList or {}) do
+		self.allItemIcons[itemName] = iconId
+	end
+	for itemName, iconId in pairs(ringsList or {}) do
 		self.allItemIcons[itemName] = iconId
 	end
 	for itemName, iconId in pairs(fruitsList or {}) do
@@ -1843,6 +2223,14 @@ function InventoryService:removeItem(userId, itemId, count)
 		return false, "Insufficient item count"
 	end
 
+	-- Проверить, что ни один экземпляр этого предмета не экипирован
+	for _, equippedSlotId in pairs(inventory.equippedItems) do
+		local equippedItemName = string.match(equippedSlotId, "^(.+)_%d+$")
+		if equippedItemName == itemId then
+			return false, "Cannot remove equipped item"
+		end
+	end
+
 	local success = self.inventoryRepository:removeItemFromPlayer(userId, itemId, count)
 	if not success then
 		return false, "Failed to remove item from inventory"
@@ -1852,48 +2240,78 @@ function InventoryService:removeItem(userId, itemId, count)
 end
 
 ---@param userId string
----@param itemId string
+---@param slotId string
 ---@param slotName string
 ---@return boolean, string?
-function InventoryService:equipItem(userId, itemId, slotName)
+function InventoryService:equipItem(userId, slotId, slotName)
 	local inventory = self.inventoryRepository:getByPlayerId(userId)
 	if not inventory then
 		return false, "Player inventory not found"
 	end
 
+	-- Извлечь itemName из slotId
+	local itemName = string.match(slotId, "^(.+)_%d+$")
+	if not itemName then
+		return false, "Invalid slotId format"
+	end
+
+
 	-- Проверить, есть ли предмет в инвентаре
-	if not inventory:hasItem(itemId) then
+	if not inventory:hasItem(itemName) then
 		return false, "Item not found in inventory"
 	end
 
-	-- Получить слот экипировки
+	-- Проверить, что slotId существует в inventorySlots
+	local slotExists = false
+	if inventory.inventorySlots[itemName] then
+		for _, slotData in ipairs(inventory.inventorySlots[itemName]) do
+			if slotData.slotId == slotId then
+				slotExists = true
+				break
+			end
+		end
+	end
+	if not slotExists then
+		return false, "Slot not found in inventory"
+	end
+
 	local slot = self.EquipmentSlot:getByName(slotName)
 	if not slot then
 		return false, "Invalid equipment slot"
 	end
 
+	-- Проверить, что слот свободен
+	local equippedItem = inventory:getEquippedItem(slot)
+	if equippedItem then
+		self.logger:warn("InventoryService", "Cannot equip item - slot", slotName, "is already occupied by:", equippedItem)
+		return false, "Equipment slot is already occupied"
+	end
+
 	-- Валидация предмета - проверить что он существует и может быть экипирован
-	if not self.allItemIcons[itemId] then
+	if not self.allItemIcons[itemName] then
 		return false, "Unknown item"
 	end
 
 	-- Проверить, что предмет не является фруктом
-	if self.fruitsList[itemId] then
-		local metaPlayer = MetaService.Class.Player:Get(game.AncestryChangedPlayers:GetPlayerByUserId(tonumber(userId)))
+	if self.fruitsList[itemName] then
+		local metaPlayer = MetaService.Class.Player:Get(game.Players:GetPlayerByUserId(tonumber(userId)))
 		metaPlayer:Notification("Fruits cannot be equipped", 3, Color3.new(1, 0.239215, 0.239215))
 		return false, "Fruits cannot be equipped"
 	end
 
-	-- Все амулеты в этой игре считаются "оружием" и могут быть экипированы в соответствующие слоты
-	if not slot:canEquipItemType("weapon") then
+	-- Проверить совместимость слота с типом предмета
+	local itemType = self:getItemType(itemName)
+	if not slot:canEquipItemType(itemType) then
 		return false, "Item cannot be equipped in this slot"
 	end
 
-	local success = self.inventoryRepository:equipItem(userId, itemId, slot)
+	local success = self.inventoryRepository:equipItem(userId, slotId, slot)
 	if not success then
+		self.logger:error("InventoryService", "Failed to equip item in repository")
 		return false, "Failed to equip item"
 	end
 
+	self.logger:info("InventoryService", "Successfully equipped item:", slotId, "in slot:", slotName)
 	return true, nil
 end
 
@@ -1901,28 +2319,52 @@ end
 ---@param slotName string
 ---@return boolean, string?
 function InventoryService:unequipItem(userId, slotName)
+	self.logger:info("InventoryService", "Unequipping item for user", userId, "from slot:", slotName)
+
 	local inventory = self.inventoryRepository:getByPlayerId(userId)
 	if not inventory then
+		self.logger:error("InventoryService", "Player inventory not found for user:", userId)
 		return false, "Player inventory not found"
 	end
 
 	-- Получить слот экипировки
 	local slot = self.EquipmentSlot:getByName(slotName)
 	if not slot then
+		self.logger:error("InventoryService", "Invalid equipment slot:", slotName)
 		return false, "Invalid equipment slot"
 	end
 
 	-- Проверить, есть ли что-то в слоте
-	if not inventory:getEquippedItem(slot) then
+	local equippedItem = inventory:getEquippedItem(slot)
+	if not equippedItem then
+		self.logger:warn("InventoryService", "No item equipped in slot:", slotName)
 		return false, "No item equipped in this slot"
 	end
 
+	self.logger:info("InventoryService", "Unequipping item:", equippedItem, "from slot:", slotName)
+
 	local success, unequippedItem = self.inventoryRepository:unequipItem(userId, slot)
 	if not success then
+		self.logger:error("InventoryService", "Failed to unequip item from repository")
 		return false, "Failed to unequip item"
 	end
 
+	self.logger:info("InventoryService", "Successfully unequipped item:", unequippedItem)
 	return true, unequippedItem
+end
+
+---@param itemId string
+---@return string
+function InventoryService:getItemType(itemId)
+	if self.amuletsList[itemId] then
+		return "amulet"
+	elseif self.ringsList[itemId] then
+		return "ring"
+	elseif self.fruitsList[itemId] then
+		return "weapon" -- фрукты считаем оружием
+	end
+
+	return "weapon" -- по умолчанию
 end
 
 ---@param userId string
@@ -1947,37 +2389,37 @@ return InventoryService
               </Item>
             </Item>
           </Item>
-          <Item class="StringValue" referent="30">
+          <Item class="StringValue" referent="31">
             <Properties>
               <string name="Name">_version</string>
-              <string name="Value">v0.0.6</string>
+              <string name="Value">v0.0.11</string>
             </Properties>
           </Item>
         </Item>
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="31">
+  <Item class="StarterPlayer" referent="32">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="32">
+    <Item class="StarterPlayerScripts" referent="33">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="ModuleScript" referent="33">
+      <Item class="ModuleScript" referent="34">
         <Properties>
           <string name="Name">MetaService</string>
         </Properties>
-        <Item class="Folder" referent="34">
+        <Item class="Folder" referent="35">
           <Properties>
             <string name="Name">Client</string>
           </Properties>
-          <Item class="ModuleScript" referent="35">
+          <Item class="ModuleScript" referent="36">
             <Properties>
               <string name="Name">Inventory</string>
             </Properties>
-            <Item class="ModuleScript" referent="36">
+            <Item class="ModuleScript" referent="37">
               <Properties>
                 <string name="Name">InventorySystemClient</string>
                 <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -1987,6 +2429,8 @@ local InventoryUI = require(script.UI.InventoryUI)
 local InventoryService = require(script.Services.InventoryService)
 
 local MetaService = require(game.StarterPlayer.StarterPlayerScripts.MetaService)
+
+
 ---@class InventorySystemClient
 ---@field shared InventorySystemShared
 ---@field diContainer DIContainer
@@ -2006,7 +2450,13 @@ function Client:_registerServices()
 	-- Регистрация InventoryClientService
 	self.diContainer:singleton("InventoryClientService", function(container)
 		local remoteEventService = container:resolve("RemoteEventService")
-		return InventoryService.new(remoteEventService)
+		---@type InventorySystemData
+		local data = container:resolve("Shared.Data")
+		local logger = container:resolve("Logger")
+		local amuletsList = data.AmuletsList
+		local ringsList = data.RingsList
+		local fruitsList = data.FruitsList
+		return InventoryService.new(remoteEventService, amuletsList, ringsList, fruitsList, logger)
 	end)
 
 	-- Регистрация InventoryUI
@@ -2016,13 +2466,16 @@ function Client:_registerServices()
 		local data = container:resolve("Shared.Data")
 		---@type InventorySystemDomain
 		local domain = container:resolve("Shared.Domain")
+		local logger = container:resolve("Logger")
 
 		local EquipmentSlotEntity = domain.entities.EquipmentSlot
 		local ItemEntity = domain.entities.Item
 		local amuletsList = data.AmuletsList
 		local fruitsList = data.FruitsList
+		local ringsList = data.RingsList
+		local bonusIcons = data.BonusIcons
 
-		return InventoryUI.new(inventoryClientService, amuletsList, fruitsList, EquipmentSlotEntity, ItemEntity)
+		return InventoryUI.new(inventoryClientService, amuletsList, fruitsList, ringsList, bonusIcons, EquipmentSlotEntity, ItemEntity, logger)
 	end)
 end
 
@@ -2048,59 +2501,103 @@ client:init()
 return Client
 ]]></string>
               </Properties>
-              <Item class="Folder" referent="37">
+              <Item class="Folder" referent="38">
                 <Properties>
                   <string name="Name">Services</string>
                 </Properties>
-                <Item class="ModuleScript" referent="38">
+                <Item class="ModuleScript" referent="39">
                   <Properties>
                     <string name="Name">InventoryService</string>
                     <string name="Source"><![CDATA[---@class InventoryClientService
 ---@field remoteEventService RemoteEventService
 ---@field _inventoryData table?
 ---@field _onInventoryUpdated function?
+---@field _onItemEquipped function?
 local InventoryClientService = {}
 InventoryClientService.__index = InventoryClientService
 
 ---@param remoteEventService RemoteEventService
+---@param logger LoggerService
 ---@return InventoryClientService
-function InventoryClientService.new(remoteEventService)
+function InventoryClientService.new(remoteEventService, amuletsList, ringsList, fruitsList, logger)
 	local self = setmetatable({}, InventoryClientService)
 	self.remoteEventService = remoteEventService
 	self._inventoryData = nil
 	self._onInventoryUpdated = nil
-
+	self._onItemEquipped = nil
+	self._amuletsList = amuletsList
+	self._ringsList = ringsList
+	self._fruitsList = fruitsList
+	self.logger = logger
 	self:setupEventHandlers()
 	return self
 end
 
 function InventoryClientService:setupEventHandlers()
+	self.logger:info("InventoryClientService", "Setting up event handlers")
+
 	-- Обработчик обновления инвентаря
 	self.remoteEventService:connectToEvent("InventoryUpdated", function(args)
+		self.logger:info("InventoryClientService", "Received InventoryUpdated event - equippedItems:", args.equippedItems or "none")
 		self._inventoryData = args
 		if self._onInventoryUpdated then
 			self._onInventoryUpdated(self._inventoryData)
+		else
+			self.logger:warn("InventoryClientService", "No _onInventoryUpdated callback set")
 		end
 	end)
 
 	-- Обработчик ошибок
 	self.remoteEventService:connectToEvent("Error", function(args)
+		self.logger:error("InventoryClientService", "Received Error event:", args)
 	end)
 
 	-- Обработчик успешного добавления предмета
 	self.remoteEventService:connectToEvent("ItemAdded", function(args)
+		self.logger:info("InventoryClientService", "Received ItemAdded event:", args)
 	end)
 
 	-- Обработчик успешного удаления предмета
 	self.remoteEventService:connectToEvent("ItemRemoved", function(args)
+		self.logger:info("InventoryClientService", "Received ItemRemoved event:", args)
 	end)
 
 	-- Обработчик успешной экипировки
 	self.remoteEventService:connectToEvent("ItemEquipped", function(args)
+		self.logger:info("InventoryClientService", "Received ItemEquipped event - slotId:", args.slotId, "slotName:", args.slotName)
+
+		-- Обновляем локальные данные equippedItems
+		if self._inventoryData and self._inventoryData.equippedItems then
+			self._inventoryData.equippedItems[args.slotName] = args.slotId
+			self.logger:debug("InventoryClientService", "Updated local equippedItems:", self._inventoryData.equippedItems)
+		end
+
+		if self._onItemEquipped then
+			self._onItemEquipped(args.slotId, args.slotName)
+		else
+			self.logger:warn("InventoryClientService", "No _onItemEquipped callback set")
+		end
 	end)
 
 	-- Обработчик успешного снятия экипировки
 	self.remoteEventService:connectToEvent("ItemUnequipped", function(args)
+		self.logger:info("InventoryClientService", "Received ItemUnequipped event - slotId:", args.slotId)
+
+		-- Обновляем локальные данные equippedItems
+		if self._inventoryData and self._inventoryData.equippedItems then
+			-- Находим и удаляем slotId из equippedItems
+			for slotName, equippedSlotId in pairs(self._inventoryData.equippedItems) do
+				if equippedSlotId == args.slotId then
+					self._inventoryData.equippedItems[slotName] = nil
+					self.logger:debug("InventoryClientService", "Removed from local equippedItems:", slotName)
+					break
+				end
+			end
+		end
+
+		if self._onItemUnequipped then
+			self._onItemUnequipped(args.slotId)
+		end
 	end)
 end
 
@@ -2111,6 +2608,7 @@ end
 
 --- Запросить инвентарь с сервера
 function InventoryClientService:requestInventory()
+	self.logger:info("InventoryClientService", "Requesting inventory from server")
 	self.remoteEventService:fireServer("GetInventory", {})
 end
 
@@ -2126,23 +2624,26 @@ end
 ---@param itemId string
 ---@param count number?
 function InventoryClientService:requestRemoveItem(itemId, count)
+	self.logger:info("InventoryClientService", "Requesting to remove item:", itemId, "count:", count or 1)
 	self.remoteEventService:fireServer("RemoveItem", {
 		itemId = itemId,
 		count = count or 1,
 	})
 end
 
----@param itemId string
+---@param slotId string
 ---@param slotName string
-function InventoryClientService:requestEquipItem(itemId, slotName)
+function InventoryClientService:requestEquipItem(slotId, slotName)
+	self.logger:info("InventoryClientService", "Requesting to equip item. SlotId:", slotId, "SlotName:", slotName)
 	self.remoteEventService:fireServer("EquipItem", {
-		itemId = itemId,
+		slotId = slotId,
 		slotName = slotName,
 	})
 end
 
 ---@param slotName string
 function InventoryClientService:requestUnequipItem(slotName)
+	self.logger:info("InventoryClientService", "Requesting to unequip item from slot:", slotName)
 	self.remoteEventService:fireServer("UnequipItem", {
 		slotName = slotName,
 	})
@@ -2201,16 +2702,40 @@ function InventoryClientService:setOnInventoryUpdated(callback)
 	self._onInventoryUpdated = callback
 end
 
+---@param callback function(itemId: string, slotName: string)
+function InventoryClientService:setOnItemEquipped(callback)
+	self._onItemEquipped = callback
+end
+
+---@param callback function(slotId: string)
+function InventoryClientService:setOnItemUnequipped(callback)
+	self._onItemUnequipped = callback
+end
+
+---@param itemId string
+---@return string
+function InventoryClientService:getItemType(itemId)
+	if self._amuletsList[itemId] then
+		return "amulet"
+	elseif self._ringsList[itemId] then
+		return "ring"
+	elseif self._fruitsList[itemId] then
+		return "weapon" -- фрукты считаем оружием
+	end
+
+	return "weapon" -- по умолчанию
+end
+
 return InventoryClientService
 ]]></string>
                   </Properties>
                 </Item>
               </Item>
-              <Item class="Folder" referent="39">
+              <Item class="Folder" referent="40">
                 <Properties>
                   <string name="Name">UI</string>
                 </Properties>
-                <Item class="ModuleScript" referent="40">
+                <Item class="ModuleScript" referent="41">
                   <Properties>
                     <string name="Name">InventoryUI</string>
                     <string name="Source"><![CDATA[local Players = game:GetService("Players")
@@ -2239,22 +2764,43 @@ InventoryUI.__index = InventoryUI
 ---@param inventoryClientService InventoryClientService
 ---@param amuletsList AmuletsList
 ---@param fruitsList FruitsList
+---@param ringsList RingsList
+---@param bonusIcons table
 ---@param EquipmentSlotEntity EquipmentSlotEntity
 ---@param ItemEntity ItemEntity
+---@param logger LoggerService
 ---@return InventoryUI
-function InventoryUI.new(inventoryClientService, amuletsList, fruitsList, EquipmentSlotEntity, ItemEntity)
+function InventoryUI.new(inventoryClientService, amuletsList, fruitsList, ringsList, bonusIcons, EquipmentSlotEntity, ItemEntity, logger)
 	local self = setmetatable({}, InventoryUI)
 	self.inventoryClientService = inventoryClientService
 	self.amuletsList = amuletsList
 	self.fruitsList = fruitsList
-
+	self.ringsList = ringsList
+	self.bonusIcons = bonusIcons
+	self.logger = logger
 	-- Объединяем списки предметов в один словарь
 	self.allItemIcons = {}
-	for itemName, iconId in pairs(amuletsList) do
-		self.allItemIcons[itemName] = iconId
+	self.allItemBonuses = {}
+	for itemName, itemData in pairs(amuletsList) do
+		self.allItemIcons[itemName] = itemData.icon
+		self.allItemBonuses[itemName] = {
+			bonusType = itemData.bonusType,
+			bonusValue = itemData.bonusValue
+		}
 	end
-	for itemName, iconId in pairs(fruitsList) do
-		self.allItemIcons[itemName] = iconId
+	for itemName, itemData in pairs(fruitsList) do
+		self.allItemIcons[itemName] = itemData.icon
+		self.allItemBonuses[itemName] = {
+			bonusType = itemData.bonusType,
+			bonusValue = itemData.bonusValue
+		}
+	end
+	for itemName, itemData in pairs(ringsList) do
+		self.allItemIcons[itemName] = itemData.icon
+		self.allItemBonuses[itemName] = {
+			bonusType = itemData.bonusType,
+			bonusValue = itemData.bonusValue
+		}
 	end
 
 	self.selectedItem = nil
@@ -2274,6 +2820,7 @@ function InventoryUI.new(inventoryClientService, amuletsList, fruitsList, Equipm
 end
 
 function InventoryUI:createUI()
+	self.logger:info("InventoryUI", "Creating UI elements")
 	local player = Players.LocalPlayer
 	local UI = player.PlayerGui:WaitForChild("UI")
 	local frames = UI.Frames
@@ -2282,22 +2829,38 @@ function InventoryUI:createUI()
 	self.equipmentFrame = self.mainFrame.EquipmentFrame
 	self.slotTemplate = self.mainFrame.ScrollingFrame.Template
 
+	self.logger:debug("InventoryUI", "UI elements created - mainFrame:", self.mainFrame and "found" or "not found")
+
 	-- Найти кнопку режима удаления
-	self.deleteModeButton = self.mainFrame:FindFirstChild("DeleteModeButton")
+	self.deleteModeButton = self.equipmentFrame:FindFirstChild("DeleteModeButton")
 	if self.deleteModeButton then
+		self.logger:debug("InventoryUI", "DeleteModeButton found, connecting click handler")
 		self.deleteModeButton.MouseButton1Click:Connect(function()
 			self:toggleDeleteMode()
 		end)
 		self:updateDeleteModeButton()
+	else
+		self.logger:warn("InventoryUI", "DeleteModeButton not found")
 	end
 
 	-- Найти TextLabel для информации о слотах
 	self.slotsInfoLabel = self.mainFrame:FindFirstChild("SlotsInfoLabel")
+	if self.slotsInfoLabel then
+		self.logger:debug("InventoryUI", "SlotsInfoLabel found")
+	else
+		self.logger:warn("InventoryUI", "SlotsInfoLabel not found")
+	end
 
 	self.mainFrame:GetPropertyChangedSignal("Visible"):Connect(function()
-		if self.mainFrame.Visible then
+		local visible = self.mainFrame.Visible
+		self.logger:info("InventoryUI", "Inventory visibility changed to:", visible)
+		self.isDeleteMode = false
+		self:updateDeleteModeButton()
+		if visible then
+			self.logger:info("InventoryUI", "Inventory opened, requesting inventory data")
 			self.inventoryClientService:requestInventory()
 		else
+			self.logger:info("InventoryUI", "Inventory closed, clearing slots")
 			self.selectedItem = nil
 			self:clearSlots()
 			-- Сбросить режим удаления при закрытии инвентаря
@@ -2321,31 +2884,27 @@ function InventoryUI:toggleDeleteMode()
 			Color3.new(1, 0.5, 0)
 		)
 	else
-		MetaService.Self:Fire(
-			"Notification",
-			"Create",
-			"Delete mode disabled",
-			3,
-			Color3.new(0, 1, 0)
-		)
+		MetaService.Self:Fire("Notification", "Create", "Delete mode disabled", 3, Color3.new(0, 1, 0))
 	end
 end
 
 function InventoryUI:updateDeleteModeButton()
-	if not self.deleteModeButton then return end
-
 	if self.isDeleteMode then
-		self.deleteModeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50) -- Красный для режима удаления
-		self.deleteModeButton.Text = "Exit Delete Mode"
+		self.deleteModeButton.ImageLabel.ImageTransparency = 0
+		self.deleteModeButton.TextLabel.Visible = true
 	else
-		self.deleteModeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- Серый для обычного режима
-		self.deleteModeButton.Text = "Delete Mode"
+		self.deleteModeButton.ImageLabel.ImageTransparency = 0.5
+		self.deleteModeButton.TextLabel.Visible = false
 	end
 end
 
 function InventoryUI:setupEquipmentSlots()
+	self.logger:info("InventoryUI", "Setting up equipment slots")
 	for _, slotData in ipairs(self.EquipmentSlotEntity.getAllSlots()) do
-		local slotButton = self.equipmentFrame:FindFirstChild("EquipSlot_" .. slotData.name)
+		local buttonName = "EquipSlot_" .. slotData.name
+		local slotButton = self.equipmentFrame:FindFirstChild(buttonName)
+		self.logger:info("InventoryUI", "Looking for slot button:", buttonName, "found:", slotButton ~= nil)
+
 		local slot =
 			self.EquipmentSlotEntity.new(slotData.name, slotData.displayName, slotData.allowedItemTypes, slotButton)
 
@@ -2354,48 +2913,79 @@ function InventoryUI:setupEquipmentSlots()
 			slotButton.MouseButton1Click:Connect(function()
 				self:onEquipmentSlotClicked(slotData.name)
 			end)
+			self.logger:info("InventoryUI", "Connected click handler for slot:", slotData.name)
+		else
+			self.logger:warn("InventoryUI", "Slot button not found for:", slotData.name)
 		end
 
 		table.insert(self.equipmentSlots, slot)
 	end
+	self.logger:info("InventoryUI", "Equipment slots setup complete, total slots:", #self.equipmentSlots)
 end
 
 function InventoryUI:createSlots(inventoryData)
 	-- Очищаем существующие слоты перед созданием новых
 	self:clearSlots()
 
-	for slotName, slotData in pairs(inventoryData.inventorySlots) do
-		local slot = self.slotTemplate:Clone()
-		slot.Name = slotName
-		slot.CountLabel.Text = slotData.count
-		slot.Parent = self.inventoryFrame
-		slot.ItemNameLabel.Text = slotName
-		slot.ItemIcon.Image = `rbxassetid://{self.allItemIcons[slotName] or 0}`
-		slot.Visible = true
+	local slotIndex = 0
+	for itemName, itemSlots in pairs(inventoryData.inventorySlots) do
+		-- Для каждого экземпляра предмета создаем отдельный слот
+		for i, _ in ipairs(itemSlots) do
+			slotIndex = slotIndex + 1
+			local slot = self.slotTemplate:Clone()
+			local slotId = itemName .. "_" .. i -- Уникальный ID для каждого слота
+			slot.Name = slotId
+			slot.CountLabel.Text = "1" -- Каждый слот содержит 1 экземпляр
+			slot.Parent = self.inventoryFrame
+			slot.ItemNameLabel.Text = itemName
+			slot.ItemIcon.Image = self.allItemIcons[itemName] or ""
+			slot.Visible = true
 
-		-- Проверяем, экипирован ли предмет, и показываем Checkmark
-		local currentInventoryData = self.inventoryClientService:getInventoryData()
-		local checkmark = slot:FindFirstChild("Checkmark")
-		if checkmark then
-			local isEquipped = false
-			if currentInventoryData and currentInventoryData.equippedItems then
-				for _, equippedItemId in pairs(currentInventoryData.equippedItems) do
-					if equippedItemId == slotName then
-						isEquipped = true
-						break
+			-- Проверяем, экипирован ли этот конкретный слот, и показываем Checkmark
+			local currentInventoryData = self.inventoryClientService:getInventoryData()
+			local checkmark = slot:FindFirstChild("Checkmark")
+			if checkmark then
+				local isEquipped = false
+				if currentInventoryData and currentInventoryData.equippedItems then
+					for _, equippedSlotId in pairs(currentInventoryData.equippedItems) do
+						if equippedSlotId == slotId then
+							isEquipped = true
+							break
+						end
+					end
+				end
+				checkmark.Visible = isEquipped
+			end
+
+			-- Устанавливаем иконку и значение бонуса
+			local bonusData = self.allItemBonuses[itemName]
+			if bonusData then
+				local bonusIconLabel = slot:FindFirstChild("BonusIconLabel")
+				if bonusIconLabel then
+					-- Скрываем bonusIconLabel для фруктов
+					if self.fruitsList[itemName] then
+						bonusIconLabel.Visible = false
+					else
+						local bonusIcon = self.bonusIcons[bonusData.bonusType]
+						if bonusIcon then
+							bonusIconLabel.Image = bonusIcon
+							local bonusValueLabel = bonusIconLabel:FindFirstChild("BonusValueLabel")
+							if bonusValueLabel then
+								bonusValueLabel.Text = "+" .. tostring(bonusData.bonusValue * 100) .. "%"
+							end
+						end
 					end
 				end
 			end
-			checkmark.Visible = isEquipped
+
+			slot.MouseButton1Click:Connect(function()
+				self:onSlotClicked(slotId) -- Передаем уникальный ID слота
+			end)
+
+			local item = self.ItemEntity.new(slotId, itemName, "weapon", slot)
+			table.insert(self.inventorySlots, item)
+			self.itemSlots[slotId] = slot -- Сохраняем UI слот по уникальному ID
 		end
-
-		slot.MouseButton1Click:Connect(function()
-			self:onSlotClicked(slotName) -- Передаем индекс вместо имени
-		end)
-
-		local item = self.ItemEntity.new(slotName, slotName, "weapon", slot)
-		table.insert(self.inventorySlots, item)
-		table.insert(self.itemSlots, slot) -- Добавляем UI слот в массив
 	end
 end
 
@@ -2408,130 +2998,204 @@ function InventoryUI:clearSlots()
 end
 
 function InventoryUI:setupEventHandlers()
+	self.logger:info("InventoryUI", "Setting up event handlers")
+
 	-- Обработчик обновления инвентаря
 	self.inventoryClientService:setOnInventoryUpdated(function(inventoryData)
+		self.logger:info("InventoryUI", "Inventory updated event received")
 		self:createSlots(inventoryData)
 		self:updateEquipmentSlots()
 		self:updateSlotsInfoLabel()
 	end)
 
 	-- Обработчик успешной экипировки
-	local remoteEventService = self.inventoryClientService.remoteEventService
-	remoteEventService:connectToEvent("ItemEquipped", function(args)
-		self:onItemEquipped(args.itemId)
+	self.inventoryClientService:setOnItemEquipped(function(itemId, slotName)
+		self.logger:info("InventoryUI", "Item equipped event received - itemId:", itemId, "slotName:", slotName)
+		self:onItemEquipped(itemId)
 	end)
 
 	-- Обработчик снятия экипировки
+	local remoteEventService = self.inventoryClientService.remoteEventService
 	remoteEventService:connectToEvent("ItemUnequipped", function(args)
-		self:onItemUnequipped(args.itemId)
+		self.logger:info("InventoryUI", "Item unequipped event received - slotId:", args.slotId)
+		self:onItemUnequipped(args.slotId)
 	end)
 end
 
-function InventoryUI:onSlotClicked(slotIndex)
+function InventoryUI:onSlotClicked(slotId)
+	self.logger:info("InventoryUI", "onSlotClicked called with slotId:", slotId)
+
 	if self.isEquipmentWindowOpen then
+		self.logger:info("InventoryUI", "Equipment window is open, ignoring slot click")
 		return
 	end
 
 	local inventoryData = self.inventoryClientService:getInventoryData()
-
 	if not inventoryData then
+		self.logger:warn("InventoryUI", "No inventory data available")
 		return
 	end
 
-	if not inventoryData.inventorySlots then
+	-- Извлекаем имя предмета из slotId (убираем "_номер")
+	local itemName = string.match(slotId, "^(.+)_%d+$")
+	if not itemName then
+		self.logger:error("InventoryUI", "Failed to extract itemName from slotId:", slotId)
 		return
 	end
 
-	local slotData = inventoryData.inventorySlots[slotIndex]
-	if slotData then
-		if self.isDeleteMode then
-			-- Режим удаления - удаляем предмет
-			self:deleteItem(slotData.id, slotData.count)
+	self.logger:info("InventoryUI", "Processing click for item:", itemName, "from slot:", slotId)
+
+	if self.isDeleteMode then
+		self.logger:info("InventoryUI", "Delete mode active, deleting item:", itemName)
+		-- Режим удаления - удаляем один экземпляр предмета
+		self:deleteItem(itemName, 1)
+	else
+		self.logger:info("InventoryUI", "Normal mode - checking equipment status for slot:", slotId)
+		-- Обычный режим - экипировка/снятие
+		-- Сбрасываем выделение всех UI слотов
+		for _, slotButton in pairs(self.itemSlots) do
+			slotButton.BorderColor3 = Color3.fromRGB(100, 100, 100)
+		end
+
+		-- Выделяем текущий слот
+		if self.itemSlots[slotId] then
+			self.itemSlots[slotId].BorderColor3 = Color3.fromRGB(255, 255, 0) -- Желтая рамка для выделения
+			self.logger:debug("InventoryUI", "Highlighted slot:", slotId)
 		else
-			-- Обычный режим - экипировка/снятие
-			-- Сбрасываем выделение всех UI слотов
-			for _, slotButton in pairs(self.itemSlots) do
-				slotButton.BorderColor3 = Color3.fromRGB(100, 100, 100)
-			end
+			self.logger:warn("InventoryUI", "Slot button not found for slotId:", slotId)
+		end
 
-			-- Выделяем текущий слот
-			if self.itemSlots[slotIndex] then
-				self.itemSlots[slotIndex].BorderColor3 = Color3.fromRGB(255, 255, 0) -- Желтая рамка для выделения
-			end
-
-			-- Проверяем, экипирован ли уже этот предмет
-			local isEquipped = false
-			local equippedSlotName = nil
-			if inventoryData.equippedItems then
-				for slotName, equippedItemId in pairs(inventoryData.equippedItems) do
-					if equippedItemId == slotData.id then
-						isEquipped = true
-						equippedSlotName = slotName
-						break
-					end
+		-- Проверяем, экипирован ли уже этот конкретный слот
+		local isEquipped = false
+		local equippedSlotName = nil
+		if inventoryData.equippedItems then
+			self.logger:debug("InventoryUI", "Checking equipped items:", inventoryData.equippedItems)
+			for slotName, equippedSlotId in pairs(inventoryData.equippedItems) do
+				if equippedSlotId == slotId then
+					isEquipped = true
+					equippedSlotName = slotName
+					break
 				end
 			end
+		else
+			self.logger:warn("InventoryUI", "No equippedItems in inventory data")
+		end
 
-			if isEquipped then
-				-- Предмет уже экипирован, снимаем его
-				self.inventoryClientService:requestUnequipItem(equippedSlotName)
+		if isEquipped then
+			self.logger:info("InventoryUI", "Item is equipped in slot:", equippedSlotName, "- requesting unequip")
+			-- Этот слот экипирован, снимаем его
+			self.inventoryClientService:requestUnequipItem(equippedSlotName)
+		else
+			self.logger:info("InventoryUI", "Item is not equipped, looking for free slot")
+			-- Этот слот не экипирован, ищем свободный слот экипировки
+			local itemType = self.inventoryClientService:getItemType(itemName)
+			self.logger:debug("InventoryUI", "Item type:", itemType)
+			local freeSlot = self:findFreeEquipmentSlot(itemType)
+			if freeSlot then
+				self.logger:info("InventoryUI", "Found free slot:", freeSlot:getName(), "- requesting equip")
+				-- Отправляем запрос на экипировку этого конкретного слота
+				self.inventoryClientService:requestEquipItem(slotId, freeSlot:getName())
 			else
-				-- Предмет не экипирован, ищем свободный слот
-				local freeSlot = self:findFreeEquipmentSlot()
-				if freeSlot then
-					-- Отправляем запрос на экипировку
-					self.inventoryClientService:requestEquipItem(slotData.id, freeSlot:getName())
-				else
-					print("No free equipment slot available for item", slotData.id)
-					MetaService.Self:Fire(
-						"Notification",
-						"Create",
-						"No free equipment slot available for item",
-						5,
-						Color3.new(0.8, 0, 1)
-					)
-				end
+				self.logger:warn("InventoryUI", "No free equipment slot found for item type:", itemType)
+				MetaService.Self:Fire(
+					"Notification",
+					"Create",
+					"No free equipment slot available for item",
+					5,
+					Color3.new(0.8, 0, 1)
+				)
 			end
 		end
 	end
 end
 
 function InventoryUI:deleteItem(itemId, count)
-	if count <= 0 then return end
+	if count <= 0 then
+		return
+	end
+
+	-- Проверяем, экипирован ли хотя бы один экземпляр этого предмета
+	local inventoryData = self.inventoryClientService:getInventoryData()
+	if inventoryData and inventoryData.equippedItems then
+		for _, equippedSlotId in pairs(inventoryData.equippedItems) do
+			-- Извлекаем itemName из equippedSlotId
+			local equippedItemName = string.match(equippedSlotId, "^(.+)_%d+$")
+			if equippedItemName == itemId then
+				-- Предмет экипирован, нельзя удалить
+				MetaService.Self:Fire("Notification", "Create", "Cannot delete equipped item", 3, Color3.new(1, 0, 0))
+				return
+			end
+		end
+	end
 
 	-- Отправляем запрос на удаление предмета
 	self.inventoryClientService:requestRemoveItem(itemId, count)
 
-	MetaService.Self:Fire(
-		"Notification",
-		"Create",
-		`Removed {count}x {itemId}`,
-		3,
-		Color3.new(1, 0.5, 0)
-	)
+	MetaService.Self:Fire("Notification", "Create", `Removed {count}x {itemId}`, 3, Color3.new(1, 0.5, 0))
 end
 
-function InventoryUI:findFreeEquipmentSlot() -- itemId зарезервировано для будущей логики определения типа предмета
+function InventoryUI:findFreeEquipmentSlot(itemType)
 	local inventoryData = self.inventoryClientService:getInventoryData()
 	if not inventoryData or not inventoryData.equippedItems then
+		self.logger:warn("InventoryUI", "No inventory data or equippedItems available")
 		return nil
 	end
 
-	-- Получаем все доступные слоты экипировки
-	local allSlots = self.EquipmentSlotEntity.getAllSlots()
+	self.logger:info("InventoryUI", "Finding free slot for item type:", itemType)
 
-	-- Ищем первый свободный слот, совместимый с типом предмета
-	for _, slot in ipairs(allSlots) do
-		local slotName = slot:getName()
-		if not inventoryData.equippedItems[slotName] then
-			-- Для базовой логики считаем, что все предметы типа "weapon"
-			-- и совместимы со всеми слотами
-			if slot:canEquipItemType("weapon") then
+	self.logger:info("InventoryUI", "Current equipped items:", inventoryData.equippedItems)
+
+	-- Специальная логика выбора слота в зависимости от типа предмета
+	if itemType == "ring" then
+		self.logger:info("InventoryUI", "Looking for slot for ring item")
+		-- Кольца экипируются в левую руку в первую очередь (как на сервере)
+		local leftHandSlot = self.EquipmentSlotEntity.LEFT_HAND
+		local leftHandName = leftHandSlot:getName()
+		local isLeftHandFree = not inventoryData.equippedItems[leftHandName]
+		self.logger:info("InventoryUI", "Left hand slot:", leftHandName, "is free:", isLeftHandFree)
+		if isLeftHandFree and leftHandSlot:canEquipItemType(itemType) then
+			self.logger:info("InventoryUI", "Selected left hand slot for ring")
+			return leftHandSlot
+		end
+		-- Если левая рука занята, пробуем правую
+		local rightHandSlot = self.EquipmentSlotEntity.RIGHT_HAND
+		local rightHandName = rightHandSlot:getName()
+		local isRightHandFree = not inventoryData.equippedItems[rightHandName]
+		self.logger:info("InventoryUI", "Right hand slot:", rightHandName, "is free:", isRightHandFree)
+		if isRightHandFree and rightHandSlot:canEquipItemType(itemType) then
+			self.logger:info("InventoryUI", "Selected right hand slot for ring")
+			return rightHandSlot
+		end
+	elseif itemType == "weapon" then
+		-- Оружие экипируется в левую руку в первую очередь
+		local leftHandSlot = self.EquipmentSlotEntity.LEFT_HAND
+		if not inventoryData.equippedItems[leftHandSlot:getName()] and leftHandSlot:canEquipItemType(itemType) then
+			return leftHandSlot
+		end
+		-- Если левая рука занята, пробуем правую
+		local rightHandSlot = self.EquipmentSlotEntity.RIGHT_HAND
+		if not inventoryData.equippedItems[rightHandSlot:getName()] and rightHandSlot:canEquipItemType(itemType) then
+			return rightHandSlot
+		end
+	else
+		self.logger:info("InventoryUI", "Using standard slot selection for item type:", itemType)
+		-- Для других типов предметов (amulet) используем стандартную логику
+		local allSlots = self.EquipmentSlotEntity.getAllSlots()
+
+		-- Ищем первый свободный слот, совместимый с типом предмета
+		for _, slot in ipairs(allSlots) do
+			local slotName = slot:getName()
+			local isSlotFree = not inventoryData.equippedItems[slotName]
+			local canEquip = slot:canEquipItemType(itemType)
+			self.logger:info("InventoryUI", "Checking slot:", slotName, "is free:", isSlotFree, "can equip:", canEquip)
+			if isSlotFree and canEquip then
+				self.logger:info("InventoryUI", "Selected slot:", slotName, "for item type:", itemType)
 				return slot
 			end
 		end
 	end
 
+	self.logger:info("InventoryUI", "No free slot found for item type:", itemType)
 	return nil
 end
 
@@ -2555,45 +3219,49 @@ function InventoryUI:onEquipmentSlotClicked(slotName)
 	end
 end
 
-function InventoryUI:onItemEquipped(itemId)
-	-- Находим UI слот инвентаря с этим предметом и показываем Checkmark
-	for _, slotButton in pairs(self.itemSlots) do
-		local itemNameLabel = slotButton:FindFirstChild("ItemNameLabel")
-		if itemNameLabel and itemNameLabel.Text == itemId then
-			local checkmark = slotButton:FindFirstChild("Checkmark")
-			if checkmark then
-				checkmark.Visible = true
-			end
-			break
+function InventoryUI:onItemEquipped(slotId)
+	self.logger:info("InventoryUI", "Item equipped event for slotId:", slotId)
+
+	-- Находим конкретный UI слот и показываем Checkmark
+	local slotButton = self.itemSlots[slotId]
+	if slotButton then
+		local checkmark = slotButton:FindFirstChild("Checkmark")
+		if checkmark then
+			self.logger:debug("InventoryUI", "Showing checkmark for slotId:", slotId)
+			checkmark.Visible = true
+		else
+			self.logger:warn("InventoryUI", "Checkmark not found for slotId:", slotId)
 		end
+	else
+		self.logger:warn("InventoryUI", "Slot button not found for slotId:", slotId)
 	end
 
-	-- Обновляем слоты экипировки
-	self:updateEquipmentSlots()
+	-- Обновление слотов экипировки происходит в обработчике InventoryUpdated,
+	-- чтобы избежать дублирования обновлений и потенциальных несоответствий данных
 end
 
-function InventoryUI:onItemUnequipped(itemId)
-	-- Находим UI слот инвентаря с этим предметом и скрываем Checkmark
-	for _, slotButton in pairs(self.itemSlots) do
-		local itemNameLabel = slotButton:FindFirstChild("ItemNameLabel")
-		if itemNameLabel and itemNameLabel.Text == itemId then
-			local checkmark = slotButton:FindFirstChild("Checkmark")
-			if checkmark then
-				checkmark.Visible = false
-			end
-			break
+function InventoryUI:onItemUnequipped(slotId)
+	-- Находим конкретный UI слот и скрываем Checkmark
+	local slotButton = self.itemSlots[slotId]
+	if slotButton then
+		local checkmark = slotButton:FindFirstChild("Checkmark")
+		if checkmark then
+			checkmark.Visible = false
 		end
 	end
 
-	-- Обновляем слоты экипировки
-	self:updateEquipmentSlots()
+	-- Обновление слотов экипировки происходит в обработчике InventoryUpdated,
+	-- чтобы избежать дублирования обновлений и потенциальных несоответствий данных
 end
 
 function InventoryUI:updateEquipmentSlots()
 	local inventoryData = self.inventoryClientService:getInventoryData()
 	if not inventoryData or not inventoryData.equippedItems then
+		self.logger:warn("InventoryUI", "No inventory data for equipment slots update")
 		return
 	end
+
+	self.logger:info("InventoryUI", "Updating equipment slots with data:", inventoryData.equippedItems)
 
 	-- Получаем все доступные иконки предметов
 	local allItemIcons = self.allItemIcons
@@ -2604,24 +3272,34 @@ function InventoryUI:updateEquipmentSlots()
 		local equippedIcon = slotButton and slotButton:FindFirstChild("EquippedIcon")
 		local equippedItemId = inventoryData.equippedItems[slotName]
 
+		self.logger:info("InventoryUI", "Processing slot:", slotName, "button exists:", slotButton ~= nil, "icon exists:", equippedIcon ~= nil, "equippedItemId:", equippedItemId or "none")
+
 		if equippedIcon then
 			if equippedItemId then
-				-- Получаем иконку предмета
-				local itemIconId = allItemIcons[equippedItemId] or "0"
-				equippedIcon.Image = `rbxassetid://{itemIconId}`
+				-- Извлекаем имя предмета из equippedItemId (убираем "_номер")
+				local itemName = string.match(equippedItemId, "^(.+)_%d+$")
+				-- Получаем иконку предмета по имени
+				local itemIconId = itemName and allItemIcons[itemName] or "0"
+				self.logger:info("InventoryUI", "Setting icon for slot", slotName, "item:", itemName, "icon:", itemIconId)
+				equippedIcon.Image = itemIconId or ""
 				slotButton.BackgroundColor3 = Color3.fromRGB(80, 80, 120) -- Выделяем занятые слоты
 				slotButton.TextTransparency = 1 -- Полупрозрачный текст для занятых слотов
 			else
+				self.logger:info("InventoryUI", "Clearing slot", slotName)
 				equippedIcon.Image = ""
 				slotButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Пустые слоты
 				slotButton.TextTransparency = 0 -- Обычная прозрачность для пустых слотов
 			end
+		else
+			self.logger:warn("InventoryUI", "EquippedIcon not found for slot", slotName)
 		end
 	end
 end
 
 function InventoryUI:updateSlotsInfoLabel()
-	if not self.slotsInfoLabel then return end
+	if not self.slotsInfoLabel then
+		return
+	end
 
 	local inventoryData = self.inventoryClientService:getInventoryData()
 	if not inventoryData or not inventoryData.inventorySlots then
@@ -2629,7 +3307,11 @@ function InventoryUI:updateSlotsInfoLabel()
 		return
 	end
 
-	local usedSlots = #inventoryData.inventorySlots
+	local usedSlots = 0
+	for _, itemSlots in pairs(inventoryData.inventorySlots) do
+		usedSlots = usedSlots + #itemSlots
+	end
+
 	local maxSlots = 50 -- Можно получить из InventoryEntity если понадобится
 	local freeSlots = maxSlots - usedSlots
 

@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.12] - 2025-11-24
+
+### Refactored
+- **InventoryRepository Code Cleanup**: Further eliminated duplicate code by extracting additional helper methods
+- **Unified Item Type Validation**: Consolidated separate checkIs* methods into universal checkItemType method
+- **Code Optimization**: Reduced code duplication across equip/unequip operations while maintaining O(1) performance
+
+### Technical Details
+- **Helper Methods**: Added _getMetaPlayer, _ensureEquippedArrays, _validateNumber, _addToEquippedArray, _removeFromEquippedArray, _handleEquippedItemLogic
+- **Type Checking**: Single checkItemType method replaces checkIsWeapon, checkIsRing, checkIsAmulet
+- **Maintainability**: Improved code readability and reduced file size from 419 to optimized structure
+
+### Next Steps
+- Complete drag-and-drop inventory UI implementation
+- Add item rarity colors and visual effects
+- Implement comprehensive item tooltips with stats
+- Create inventory filtering and search system
+
 ## [0.0.11] - 2025-11-24
 
 ### Refactored

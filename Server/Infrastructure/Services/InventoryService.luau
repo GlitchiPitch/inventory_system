@@ -98,7 +98,7 @@ function InventoryService:removeItem(userId, itemId, count)
 	end
 
 	-- Проверить, что ни один экземпляр этого предмета не экипирован
-	for equippedSlotName, equippedSlotId in pairs(inventory.equippedItems) do
+	for _, equippedSlotId in pairs(inventory.equippedItems) do
 		local equippedItemName = string.match(equippedSlotId, "^(.+)_%d+$")
 		if equippedItemName == itemId then
 			return false, "Cannot remove equipped item"
@@ -154,6 +154,13 @@ function InventoryService:equipItem(userId, slotId, slotName)
 		return false, "Invalid equipment slot"
 	end
 
+	-- Проверить, что слот свободен
+	local equippedItem = inventory:getEquippedItem(slot)
+	if equippedItem then
+		self.logger:warn("InventoryService", "Cannot equip item - slot", slotName, "is already occupied by:", equippedItem)
+		return false, "Equipment slot is already occupied"
+	end
+
 	-- Валидация предмета - проверить что он существует и может быть экипирован
 	if not self.allItemIcons[itemName] then
 		return false, "Unknown item"
@@ -174,9 +181,11 @@ function InventoryService:equipItem(userId, slotId, slotName)
 
 	local success = self.inventoryRepository:equipItem(userId, slotId, slot)
 	if not success then
+		self.logger:error("InventoryService", "Failed to equip item in repository")
 		return false, "Failed to equip item"
 	end
 
+	self.logger:info("InventoryService", "Successfully equipped item:", slotId, "in slot:", slotName)
 	return true, nil
 end
 
@@ -184,27 +193,37 @@ end
 ---@param slotName string
 ---@return boolean, string?
 function InventoryService:unequipItem(userId, slotName)
+	self.logger:info("InventoryService", "Unequipping item for user", userId, "from slot:", slotName)
+
 	local inventory = self.inventoryRepository:getByPlayerId(userId)
 	if not inventory then
+		self.logger:error("InventoryService", "Player inventory not found for user:", userId)
 		return false, "Player inventory not found"
 	end
 
 	-- Получить слот экипировки
 	local slot = self.EquipmentSlot:getByName(slotName)
 	if not slot then
+		self.logger:error("InventoryService", "Invalid equipment slot:", slotName)
 		return false, "Invalid equipment slot"
 	end
 
 	-- Проверить, есть ли что-то в слоте
-	if not inventory:getEquippedItem(slot) then
+	local equippedItem = inventory:getEquippedItem(slot)
+	if not equippedItem then
+		self.logger:warn("InventoryService", "No item equipped in slot:", slotName)
 		return false, "No item equipped in this slot"
 	end
 
+	self.logger:info("InventoryService", "Unequipping item:", equippedItem, "from slot:", slotName)
+
 	local success, unequippedItem = self.inventoryRepository:unequipItem(userId, slot)
 	if not success then
+		self.logger:error("InventoryService", "Failed to unequip item from repository")
 		return false, "Failed to unequip item"
 	end
 
+	self.logger:info("InventoryService", "Successfully unequipped item:", unequippedItem)
 	return true, unequippedItem
 end
 

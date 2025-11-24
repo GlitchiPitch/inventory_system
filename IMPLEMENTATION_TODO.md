@@ -12,6 +12,7 @@
 - ✅ **Network Synchronization**: Complete remote event system for inventory operations
 - ✅ **Item Bonus Display**: Basic bonus icons and values display in inventory slots
 - ✅ **Inventory Data Structure Refactoring**: Migrated from dictionary-based to array-based Accessories format with simplified item model
+- ✅ **Repository Code Cleanup**: Extracted helper methods in InventoryRepository (_getMetaPlayer, _ensureEquippedArrays, etc.)
 
 ## Next Development Phase (v0.0.9)
 
@@ -63,6 +64,7 @@
 - [x] **Code Cleanup**: Removed debug print/warn statements from services and repositories
 - [x] **Data Structure Optimization**: Refactored inventory from array to dictionary for O(1) lookup performance
 - [x] **InventoryRepository Refactoring**: Eliminated duplicate code by extracting helper methods (_getMetaPlayer, _ensureEquippedArrays, etc.)
+- [x] **Unified Item Type Checking**: Replaced separate checkIs* methods with universal checkItemType method
 - [ ] **Unit Tests**: Add comprehensive test coverage
 - [ ] **Error Logging**: Implement structured error reporting
 - [ ] **Performance Monitoring**: Add performance metrics

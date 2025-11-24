@@ -28,10 +28,11 @@ function Client:_registerServices()
 		local remoteEventService = container:resolve("RemoteEventService")
 		---@type InventorySystemData
 		local data = container:resolve("Shared.Data")
+		local logger = container:resolve("Logger")
 		local amuletsList = data.AmuletsList
 		local ringsList = data.RingsList
 		local fruitsList = data.FruitsList
-		return InventoryService.new(remoteEventService, amuletsList, ringsList, fruitsList)
+		return InventoryService.new(remoteEventService, amuletsList, ringsList, fruitsList, logger)
 	end)
 
 	-- Регистрация InventoryUI
@@ -41,6 +42,7 @@ function Client:_registerServices()
 		local data = container:resolve("Shared.Data")
 		---@type InventorySystemDomain
 		local domain = container:resolve("Shared.Domain")
+		local logger = container:resolve("Logger")
 
 		local EquipmentSlotEntity = domain.entities.EquipmentSlot
 		local ItemEntity = domain.entities.Item
@@ -49,7 +51,7 @@ function Client:_registerServices()
 		local ringsList = data.RingsList
 		local bonusIcons = data.BonusIcons
 
-		return InventoryUI.new(inventoryClientService, amuletsList, fruitsList, ringsList, bonusIcons, EquipmentSlotEntity, ItemEntity)
+		return InventoryUI.new(inventoryClientService, amuletsList, fruitsList, ringsList, bonusIcons, EquipmentSlotEntity, ItemEntity, logger)
 	end)
 end
 

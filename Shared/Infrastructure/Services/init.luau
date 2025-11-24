@@ -20,8 +20,9 @@ function Services.new(diContainer, remoteEvent)
 end
 
 function Services:_registerServices()
-	self.diContainer:singleton("RemoteEventService", function()
-		return RemoteEventService.new(self.remoteEvent)
+	self.diContainer:singleton("RemoteEventService", function(container)
+		local logger = container:resolve("Logger")
+		return RemoteEventService.new(self.remoteEvent, logger)
 	end)
 
 	-- Регистрируем LoggerService
