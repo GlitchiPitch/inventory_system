@@ -41,16 +41,6 @@ function InventoryRepository:_getMetaPlayer(userId)
 	return metaPlayer
 end
 
----@param metaPlayer any
-function InventoryRepository:_ensureEquippedArrays(metaPlayer)
-	if not metaPlayer.Data.Inventory.Accessories.EquippedRings then
-		metaPlayer.Data.Inventory.Accessories.EquippedRings = {}
-	end
-	if not metaPlayer.Data.Inventory.Accessories.EquippedAmulets then
-		metaPlayer.Data.Inventory.Accessories.EquippedAmulets = {}
-	end
-end
-
 ---@param value any
 ---@return number
 function InventoryRepository:_validateNumber(value)
@@ -63,44 +53,47 @@ function InventoryRepository:_validateNumber(value)
 	end
 end
 
----@param metaPlayer any
----@param itemName string
----@param arrayName string
-function InventoryRepository:_addToEquippedArray(metaPlayer, itemName, arrayName)
-	local array = metaPlayer.Data.Inventory.Accessories[arrayName]
-	if not array then
-		metaPlayer.Data.Inventory.Accessories[arrayName] = {}
-		array = metaPlayer.Data.Inventory.Accessories[arrayName]
-	end
-
-	local alreadyEquipped = false
-	for _, item in ipairs(array) do
-		if item == itemName then
-			alreadyEquipped = true
-			break
-		end
-	end
-
-	if not alreadyEquipped then
-		table.insert(array, itemName)
+---@param item table
+---@return string?
+function InventoryRepository:_getSlotNameForItem(item)
+	if item.type == "ring" then
+		return "RingSlot"
+	elseif item.type == "amulet" then
+		return "AmuletSlot"
+	else
+		return nil -- Для фруктов и других предметов слоты могут не быть нужны
 	end
 end
 
----@param metaPlayer any
 ---@param itemName string
----@param arrayName string
-function InventoryRepository:_removeFromEquippedArray(metaPlayer, itemName, arrayName)
-	local array = metaPlayer.Data.Inventory.Accessories[arrayName]
-	if not array then
-		return
+---@return string
+function InventoryRepository:_getItemType(itemName)
+	if self:checkIsAmulet(itemName) then
+		return "amulet"
+	elseif self:checkIsFruit(itemName) then
+		return "fruit"
+	elseif self:checkIsRing(itemName) then
+		return "ring"
+	else
+		return "unknown"
 	end
+end
 
-	for i, item in ipairs(array) do
-		if item == itemName then
-			table.remove(array, i)
-			break
+---@param accessories table
+---@param itemName string
+---@param instanceIndex number
+---@return table?
+function InventoryRepository:_findExistingItem(accessories, itemName, instanceIndex)
+	local count = 0
+	for _, item in ipairs(accessories) do
+		if item.name == itemName then
+			count = count + 1
+			if count == instanceIndex then
+				return item
+			end
 		end
 	end
+	return nil
 end
 
 ---@param userId string
@@ -116,6 +109,11 @@ function InventoryRepository:_handleEquippedItemLogic(userId, itemName, action)
 		return
 	end
 
+	local accessories = metaPlayer.Data.Inventory.Accessories
+	if not accessories or type(accessories) ~= "table" then
+		return
+	end
+
 	local itemType = nil
 	if self:checkItemType("ring", itemName) then
 		itemType = "ring"
@@ -127,14 +125,12 @@ function InventoryRepository:_handleEquippedItemLogic(userId, itemName, action)
 		return
 	end
 
-	self:_ensureEquippedArrays(metaPlayer)
-
-	local arrayName = itemType == "ring" and "EquippedRings" or "EquippedAmulets"
-
-	if action == "add" then
-		self:_addToEquippedArray(metaPlayer, itemName, arrayName)
-	elseif action == "remove" then
-		self:_removeFromEquippedArray(metaPlayer, itemName, arrayName)
+	-- Найти первый предмет с данным именем и установить/снять флаг equipped
+	for _, item in ipairs(accessories) do
+		if item.name == itemName and item.type == itemType then
+			item.equipped = (action == "add")
+			break -- Меняем только первый найденный предмет
+		end
 	end
 end
 
@@ -182,48 +178,49 @@ function InventoryRepository:getByPlayerId(userId)
 	end
 
 	-- Получить данные инвентаря
-	local inventoryData = metaPlayer.Data.Inventory.Accessories
-	if not inventoryData then
+	local accessoriesData = metaPlayer.Data.Inventory.Accessories
+	if not accessoriesData or type(accessoriesData) ~= "table" then
 		return nil
 	end
 
 	-- Создать объект Inventory из данных
-	-- Преобразовать данные из формата {name: count} в inventorySlots
+	-- Преобразовать массив предметов в inventorySlots и equippedItems
 
 	local inventorySlots = {}
+	local equippedItems = {}
 
-	local function createSlotsForItem(name, count)
-		local validatedCount = self:_validateNumber(count)
-		if validatedCount > 0 then
-			inventorySlots[name] = {}
-			for i = 1, validatedCount do
-				local slotId = name .. "_" .. i
-				table.insert(inventorySlots[name], { id = name, slotId = slotId })
+	-- Группировать предметы по имени для подсчета количества
+	local itemCounts = {}
+
+	for _, item in ipairs(accessoriesData) do
+		-- Все предметы в массиве принадлежат игроку
+		itemCounts[item.name] = (itemCounts[item.name] or 0) + 1
+		if item.equipped then
+			-- Предполагаем, что equipped предметы имеют slot информацию
+			-- Нужно определить slot name на основе типа предмета
+			local slotName = self:_getSlotNameForItem(item)
+			if slotName then
+				equippedItems[slotName] = item.name .. "_1" -- Используем первый слот
 			end
 		end
 	end
 
-	local amuletsData = inventoryData["Amulets"] or {}
-	for name, count in pairs(amuletsData) do
-		createSlotsForItem(name, count)
-	end
-
-	local fruitsData = inventoryData["Fruits"] or {}
-	for name, count in pairs(fruitsData) do
-		createSlotsForItem(name, count)
-	end
-
-	local ringsData = inventoryData["Rings"] or {}
-	for name, count in pairs(ringsData) do
-		createSlotsForItem(name, count)
+	-- Создать inventorySlots на основе подсчитанных предметов
+	for itemName, count in pairs(itemCounts) do
+		local validatedCount = self:_validateNumber(count)
+		if validatedCount > 0 then
+			inventorySlots[itemName] = {}
+			for i = 1, validatedCount do
+				local slotId = itemName .. "_" .. i
+				table.insert(inventorySlots[itemName], { id = itemName, slotId = slotId })
+			end
+		end
 	end
 
 	local inventory = self.InventoryEntity.fromDataStructure({
-		equippedItems = inventoryData.EquippedAccessories or {},
+		equippedItems = equippedItems,
 		inventorySlots = inventorySlots,
 	})
-
-	self:_ensureEquippedArrays(metaPlayer)
 
 	-- Добавить в кэш
 	-- self._cache[userId] = inventory
@@ -242,30 +239,60 @@ function InventoryRepository:save(userId, inventory)
 		return
 	end
 
-	-- Сохранить данные инвентаря
+	-- Получить текущий массив предметов или создать новый
+	local currentAccessories = metaPlayer.Data.Inventory.Accessories
+	if not currentAccessories or type(currentAccessories) ~= "table" then
+		currentAccessories = {}
+	end
+
 	local data = inventory:toDataStructure()
-	metaPlayer.Data.Inventory["EquippedAccessories"] = data.equippedItems
-	-- Сохранить предметы по категориям
 
-	local amuletsData = {}
-	local fruitsData = {}
-	local ringsData = {}
-
-	for itemName, itemSlots in pairs(data.inventorySlots) do
-		local count = self:_validateNumber(#itemSlots)
-		if self:checkItemType("amulet", itemName) then
-			amuletsData[itemName] = count
-		elseif self:checkItemType("fruit", itemName) then
-			fruitsData[itemName] = count
-		elseif self:checkItemType("ring", itemName) then
-			ringsData[itemName] = count
+	-- Создать словарь equipped предметов для быстрого поиска
+	local equippedItemsMap = {}
+	for slotName, slotId in pairs(data.equippedItems) do
+		local itemName = string.match(slotId, "^(.+)_%d+$")
+		if itemName then
+			equippedItemsMap[itemName] = slotName
 		end
 	end
 
-	metaPlayer.Data.Inventory["Amulets"] = amuletsData
-	metaPlayer.Data.Inventory["Fruits"] = fruitsData
-	metaPlayer.Data.Inventory["Rings"] = ringsData
+	-- Создать словарь предметов в инвентаре с их количеством
+	local inventoryItemsMap = {}
+	for itemName, itemSlots in pairs(data.inventorySlots) do
+		local count = self:_validateNumber(#itemSlots)
+		if count > 0 then
+			inventoryItemsMap[itemName] = count
+		end
+	end
 
+	-- Обновить массив Accessories
+	local newAccessories = {}
+
+	-- Добавить предметы из инвентаря
+	for itemName, count in pairs(inventoryItemsMap) do
+		local itemType = self:_getItemType(itemName)
+		local isEquipped = equippedItemsMap[itemName] ~= nil
+
+		-- Для каждого экземпляра предмета добавить отдельный элемент
+		for i = 1, count do
+			local itemData = {
+				name = itemName,
+				type = itemType,
+				equipped = isEquipped
+			}
+
+			-- Добавить level если есть в существующих данных
+			local existingItem = self:_findExistingItem(currentAccessories, itemName, i)
+			if existingItem and existingItem.level then
+				itemData.level = existingItem.level
+			end
+
+			table.insert(newAccessories, itemData)
+		end
+	end
+
+	-- Сохранить обновленный массив
+	metaPlayer.Data.Inventory.Accessories = newAccessories
 end
 
 ---@param userId string
@@ -361,3 +388,32 @@ function InventoryRepository:clearCache(userId)
 end
 
 return InventoryRepository
+
+-- Пример новой структуры данных Accessories в metaPlayer.Data.Inventory.Accessories
+-- Теперь данные хранятся в виде массива предметов с флагом equipped
+-- Все предметы в массиве принадлежат игроку (owned = true по умолчанию)
+-- local Accessories = {
+-- 	{
+-- 		name = "Amulet_1",
+-- 		type = "amulet",
+-- 		level = 1,
+-- 		equipped = true
+-- 	},
+-- 	{
+-- 		name = "Amulet_1", -- второй экземпляр того же предмета
+-- 		type = "amulet",
+-- 		level = 1,
+-- 		equipped = false
+-- 	},
+-- 	{
+-- 		name = "Fruit_1",
+-- 		type = "fruit",
+-- 		equipped = false
+-- 	},
+-- 	{
+-- 		name = "Ring_1",
+-- 		type = "ring",
+-- 		level = 1,
+-- 		equipped = false
+-- 	}
+-- }

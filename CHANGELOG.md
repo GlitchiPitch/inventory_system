@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.11] - 2025-11-24
+
+### Refactored
+- **Inventory Data Structure**: Complete redesign of Accessories data format from dictionary-based to array-based structure
+- **Simplified Item Model**: Removed redundant `owned` field, keeping only essential `equipped` flag
+- **Streamlined Repository Logic**: Updated getByPlayerId and save methods to work with new item array structure
+
+### Technical Details
+- **Data Structure**: Changed from `Accessories = {Owned: [...], Equipped: [...]}` to `Accessories = [{name, type, level?, equipped}]`
+- **Performance**: Maintained O(n) traversal for small inventory sizes with improved data consistency
+- **Backward Compatibility**: Migration path for existing player data structures
+- **Code Reduction**: Eliminated separate equipped arrays management (EquippedRings, EquippedAmulets)
+
+### Next Steps
+- Complete drag-and-drop inventory UI implementation
+- Add item rarity colors and visual effects
+- Implement comprehensive item tooltips with stats
+- Create inventory filtering and search system
+
 ## [0.0.10] - 2025-11-24
 
 ### Refactored
