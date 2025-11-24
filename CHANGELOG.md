@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.14] - 2025-11-24
+
+### Fixed
+- **Equipment Slot Identification**: Fixed incorrect slot names ("RingSlot", "AmuletSlot") to proper names ("rightHand", "helmet")
+- **Multiple Item Instance Handling**: Resolved bug where equipping one instance of identical items (e.g., two "Shadow Gem" rings) would equip both simultaneously
+- **Inventory Persistence Logic**: Corrected _handleEquippedItemLogic to work with specific slotId instead of itemName, ensuring proper equipped flag management for individual item instances
+- **Equipment Data Synchronization**: Fixed equippedItems mapping and loading logic to properly save/load slotId and slotName for each equipped item
+
+### Changed
+- **InventoryRepository**: Updated _handleEquippedItemLogic method to use slotId parameter for precise item instance targeting
+- **Equipment Slot Names**: Standardized slot naming convention to match EquipmentSlotEntity definitions
+- **Data Structure Consistency**: Improved synchronization between inventorySlots, equippedItems, and Accessories array formats
+
+### Technical Details
+- **Slot ID Logic**: Changed from itemName-based to slotId-based equipment flag management (e.g., "Shadow Gem_2" targets specific array index)
+- **Equipment Persistence**: Enhanced save/load operations to maintain slotId and slotName mapping for equipped items
+- **UI Synchronization**: Fixed client-side equipment slot display to properly reflect server-side equipped item state
+
+### Next Steps
+- Complete drag-and-drop inventory UI implementation
+- Add item rarity colors and visual effects
+- Implement comprehensive item tooltips with stats
+- Create inventory filtering and search system
+
 ## [0.0.13] - 2025-11-24
 
 ### Added

@@ -103,10 +103,10 @@ function InventoryRepository:_findExistingItem(accessories, itemName, instanceIn
 end
 
 ---@param userId string
----@param itemName string
+---@param slotId string
 ---@param action string
-function InventoryRepository:_handleEquippedItemLogic(userId, itemName, action)
-	if not itemName then
+function InventoryRepository:_handleEquippedItemLogic(userId, slotId, action)
+	if not slotId then
 		return
 	end
 
@@ -120,18 +120,26 @@ function InventoryRepository:_handleEquippedItemLogic(userId, itemName, action)
 		return
 	end
 
+	-- Извлечь itemName и индекс из slotId (например, "Shadow Gem_2" -> "Shadow Gem", 2)
+	local itemName, indexStr = string.match(slotId, "^(.+)_(%d+)$")
+	if not itemName or not indexStr then
+		return
+	end
+
+	local index = tonumber(indexStr)
+	if not index then
+		return
+	end
+
 	-- Проверить, что предмет может быть экипирован (кольцо или амулет)
 	local isEquipable = self:checkItemType("ring", itemName) or self:checkItemType("amulet", itemName)
 	if not isEquipable then
 		return
 	end
 
-	-- Найти первый предмет с данным именем и установить/снять флаг equipped
-	for _, item in ipairs(accessories) do
-		if item.name == itemName then
-			item.equipped = (action == "add")
-			break -- Меняем только первый найденный предмет
-		end
+	-- Найти предмет по индексу в массиве accessories
+	if accessories[index] and accessories[index].name == itemName then
+		accessories[index].equipped = (action == "add")
 	end
 end
 
@@ -211,16 +219,16 @@ function InventoryRepository:getByPlayerId(userId)
 				end
 			end
 		end
+	end
 
-		-- Создать inventorySlots на основе подсчитанных предметов
-		for itemName, count in pairs(itemCounts) do
-			local validatedCount = self:_validateNumber(count)
-			if validatedCount > 0 then
-				inventorySlots[itemName] = {}
-				for i = 1, validatedCount do
-					local slotId = itemName .. "_" .. i
-					table.insert(inventorySlots[itemName], { id = itemName, slotId = slotId })
-				end
+	-- Создать inventorySlots на основе подсчитанных предметов
+	for itemName, count in pairs(itemCounts) do
+		local validatedCount = self:_validateNumber(count)
+		if validatedCount > 0 then
+			inventorySlots[itemName] = {}
+			for i = 1, validatedCount do
+				local slotId = itemName .. "_" .. i
+				table.insert(inventorySlots[itemName], { id = itemName, slotId = slotId })
 			end
 		end
 	end
@@ -370,19 +378,10 @@ function InventoryRepository:equipItem(userId, slotId, slot)
 
 	local success = inventory:equipItem(slotId, slot)
 	if success then
-		self.logger:info("InventoryRepository", "Equipping item", slotId, "in slot", slot:getName(), "- saving inventory")
 		self:save(userId, inventory)
 
-		-- Извлечь itemName из slotId для дополнительной логики
-		local itemName = string.match(slotId, "^(.+)_%d+$")
-		self:_handleEquippedItemLogic(userId, itemName, "add")
-
-		-- Проверить, что данные сохранены
-		local savedInventory = self:getByPlayerId(userId)
-		local equippedItem = savedInventory:getEquippedItem(slot)
-		self.logger:info("InventoryRepository", "Verification: equipped item in slot", slot:getName(), "is", equippedItem or "none")
-	else
-		self.logger:error("InventoryRepository", "Failed to equip item in inventory entity")
+		-- Обновить флаги equipped в массиве Accessories
+		self:_handleEquippedItemLogic(userId, slotId, "add")
 	end
 
 	return success
@@ -401,9 +400,8 @@ function InventoryRepository:unequipItem(userId, slot)
 	if success then
 		self:save(userId, inventory)
 
-		-- Извлечь itemName из unequippedSlotId для дополнительной логики
-		local unequippedItemName = unequippedSlotId and string.match(unequippedSlotId, "^(.+)_%d+$")
-		self:_handleEquippedItemLogic(userId, unequippedItemName, "remove")
+		-- Обновить флаги equipped в массиве Accessories
+		self:_handleEquippedItemLogic(userId, unequippedSlotId, "remove")
 	end
 
 	return success, unequippedSlotId
@@ -416,3 +414,28 @@ end
 
 return InventoryRepository
 
+-- Пример новой структуры данных Accessories в metaPlayer.Data.Inventory.Accessories
+-- Теперь данные хранятся в виде массива предметов с флагом equipped
+-- Тип предмета определяется динамически по имени
+-- Все предметы в массиве принадлежат игроку (owned = true по умолчанию)
+-- local Accessories = {
+-- 	{
+-- 		name = "Amulet_1",
+-- 		level = 1,
+-- 		equipped = true
+-- 	},
+-- 	{
+-- 		name = "Amulet_1", -- второй экземпляр того же предмета
+-- 		level = 1,
+-- 		equipped = false
+-- 	},
+-- 	{
+-- 		name = "Fruit_1",
+-- 		equipped = false
+-- 	},
+-- 	{
+-- 		name = "Ring_1",
+-- 		level = 1,
+-- 		equipped = false
+-- 	}
+-- }
