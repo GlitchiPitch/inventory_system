@@ -2003,9 +2003,14 @@ function InventoryRemoteService:setupEventHandlers()
         self:handleEquipItem(player, args)
     end)
 
-    -- Снятие предмета
+	-- Снятие предмета
     self.remoteEventService:connectToEvent("UnequipItem", function(player, args)
         self:handleUnequipItem(player, args)
+    end)
+
+    -- Сброс инвентаря
+    self.remoteEventService:connectToEvent("ResetInventory", function(player, _args)
+        self:handleResetInventory(player)
     end)
 end
 
@@ -2117,6 +2122,24 @@ function InventoryRemoteService:handleUnequipItem(player, args)
     end
 end
 
+---@param player Player
+function InventoryRemoteService:handleResetInventory(player)
+    local userId = tostring(player.UserId)
+
+    self.logger:info("InventoryRemoteService", "Handling reset inventory request from player:", player.Name)
+
+    local success = self.inventoryService:resetPlayerInventory(userId)
+    if success then
+        self.logger:info("InventoryRemoteService", "Successfully reset inventory for player:", player.Name)
+        self.remoteEventService:fireClient(player, "InventoryReset", {})
+        -- Отправить обновленный инвентарь
+        self:handleGetInventory(player)
+    else
+        self.logger:error("InventoryRemoteService", "Failed to reset inventory for player:", player.Name)
+        self.remoteEventService:fireClient(player, "Error", {message = "Failed to reset inventory"})
+    end
+end
+
 return InventoryRemoteService
 ]]></string>
                 </Properties>
@@ -2171,6 +2194,24 @@ end
 function InventoryService:getPlayerInventory(userId)
 	local inventory = self.inventoryRepository:getByPlayerId(userId)
 	return inventory
+end
+
+---@param userId string
+---@return boolean
+function InventoryService:resetPlayerInventory(userId)
+	local metaPlayer = self.inventoryRepository:_getMetaPlayer(userId)
+	if not metaPlayer then
+		return false
+	end
+
+	-- Очистить данные инвентаря
+	metaPlayer.Data.Inventory.Accessories = {}
+
+	-- Создать новый пустой инвентарь
+	local emptyInventory = self.inventoryRepository.InventoryEntity.new()
+	self.inventoryRepository:save(userId, emptyInventory)
+
+	return true
 end
 
 ---@param userId string
@@ -2392,7 +2433,7 @@ return InventoryService
           <Item class="StringValue" referent="31">
             <Properties>
               <string name="Name">_version</string>
-              <string name="Value">v0.0.11</string>
+              <string name="Value">v0.0.12</string>
             </Properties>
           </Item>
         </Item>
@@ -2562,6 +2603,13 @@ function InventoryClientService:setupEventHandlers()
 		self.logger:info("InventoryClientService", "Received ItemRemoved event:", args)
 	end)
 
+	-- Обработчик сброса инвентаря
+	self.remoteEventService:connectToEvent("InventoryReset", function(args)
+		self.logger:info("InventoryClientService", "Received InventoryReset event:", args)
+		-- Очистить локальные данные
+		self._inventoryData = nil
+	end)
+
 	-- Обработчик успешной экипировки
 	self.remoteEventService:connectToEvent("ItemEquipped", function(args)
 		self.logger:info("InventoryClientService", "Received ItemEquipped event - slotId:", args.slotId, "slotName:", args.slotName)
@@ -2647,6 +2695,12 @@ function InventoryClientService:requestUnequipItem(slotName)
 	self.remoteEventService:fireServer("UnequipItem", {
 		slotName = slotName,
 	})
+end
+
+--- Запросить сброс инвентаря
+function InventoryClientService:requestResetInventory()
+	self.logger:info("InventoryClientService", "Requesting to reset inventory")
+	self.remoteEventService:fireServer("ResetInventory", {})
 end
 
 ---@param itemId string
@@ -2843,6 +2897,17 @@ function InventoryUI:createUI()
 		self.logger:warn("InventoryUI", "DeleteModeButton not found")
 	end
 
+	-- Найти кнопку сброса инвентаря
+	self.resetButton = self.equipmentFrame:FindFirstChild("ResetButton")
+	if self.resetButton then
+		self.logger:debug("InventoryUI", "ResetButton found, connecting click handler")
+		self.resetButton.MouseButton1Click:Connect(function()
+			self:resetInventory()
+		end)
+	else
+		self.logger:warn("InventoryUI", "ResetButton not found")
+	end
+
 	-- Найти TextLabel для информации о слотах
 	self.slotsInfoLabel = self.mainFrame:FindFirstChild("SlotsInfoLabel")
 	if self.slotsInfoLabel then
@@ -2886,6 +2951,17 @@ function InventoryUI:toggleDeleteMode()
 	else
 		MetaService.Self:Fire("Notification", "Create", "Delete mode disabled", 3, Color3.new(0, 1, 0))
 	end
+end
+
+function InventoryUI:resetInventory()
+	MetaService.Self:Fire(
+		"Notification",
+		"Create",
+		"Resetting inventory...",
+		3,
+		Color3.new(1, 0.5, 0)
+	)
+	self.inventoryClientService:requestResetInventory()
 end
 
 function InventoryUI:updateDeleteModeButton()

@@ -52,6 +52,13 @@ function InventoryClientService:setupEventHandlers()
 		self.logger:info("InventoryClientService", "Received ItemRemoved event:", args)
 	end)
 
+	-- Обработчик сброса инвентаря
+	self.remoteEventService:connectToEvent("InventoryReset", function(args)
+		self.logger:info("InventoryClientService", "Received InventoryReset event:", args)
+		-- Очистить локальные данные
+		self._inventoryData = nil
+	end)
+
 	-- Обработчик успешной экипировки
 	self.remoteEventService:connectToEvent("ItemEquipped", function(args)
 		self.logger:info("InventoryClientService", "Received ItemEquipped event - slotId:", args.slotId, "slotName:", args.slotName)
@@ -137,6 +144,12 @@ function InventoryClientService:requestUnequipItem(slotName)
 	self.remoteEventService:fireServer("UnequipItem", {
 		slotName = slotName,
 	})
+end
+
+--- Запросить сброс инвентаря
+function InventoryClientService:requestResetInventory()
+	self.logger:info("InventoryClientService", "Requesting to reset inventory")
+	self.remoteEventService:fireServer("ResetInventory", {})
 end
 
 ---@param itemId string

@@ -44,9 +44,14 @@ function InventoryRemoteService:setupEventHandlers()
         self:handleEquipItem(player, args)
     end)
 
-    -- Снятие предмета
+	-- Снятие предмета
     self.remoteEventService:connectToEvent("UnequipItem", function(player, args)
         self:handleUnequipItem(player, args)
+    end)
+
+    -- Сброс инвентаря
+    self.remoteEventService:connectToEvent("ResetInventory", function(player, _args)
+        self:handleResetInventory(player)
     end)
 end
 
@@ -155,6 +160,24 @@ function InventoryRemoteService:handleUnequipItem(player, args)
     else
         self.logger:error("InventoryRemoteService", "Failed to unequip item:", unequippedItem)
         self.remoteEventService:fireClient(player, "Error", {message = unequippedItem or "Failed to unequip item"})
+    end
+end
+
+---@param player Player
+function InventoryRemoteService:handleResetInventory(player)
+    local userId = tostring(player.UserId)
+
+    self.logger:info("InventoryRemoteService", "Handling reset inventory request from player:", player.Name)
+
+    local success = self.inventoryService:resetPlayerInventory(userId)
+    if success then
+        self.logger:info("InventoryRemoteService", "Successfully reset inventory for player:", player.Name)
+        self.remoteEventService:fireClient(player, "InventoryReset", {})
+        -- Отправить обновленный инвентарь
+        self:handleGetInventory(player)
+    else
+        self.logger:error("InventoryRemoteService", "Failed to reset inventory for player:", player.Name)
+        self.remoteEventService:fireClient(player, "Error", {message = "Failed to reset inventory"})
     end
 end
 

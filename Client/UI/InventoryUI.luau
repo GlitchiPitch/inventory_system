@@ -103,6 +103,17 @@ function InventoryUI:createUI()
 		self.logger:warn("InventoryUI", "DeleteModeButton not found")
 	end
 
+	-- Найти кнопку сброса инвентаря
+	self.resetButton = self.equipmentFrame:FindFirstChild("ResetButton")
+	if self.resetButton then
+		self.logger:debug("InventoryUI", "ResetButton found, connecting click handler")
+		self.resetButton.MouseButton1Click:Connect(function()
+			self:resetInventory()
+		end)
+	else
+		self.logger:warn("InventoryUI", "ResetButton not found")
+	end
+
 	-- Найти TextLabel для информации о слотах
 	self.slotsInfoLabel = self.mainFrame:FindFirstChild("SlotsInfoLabel")
 	if self.slotsInfoLabel then
@@ -146,6 +157,17 @@ function InventoryUI:toggleDeleteMode()
 	else
 		MetaService.Self:Fire("Notification", "Create", "Delete mode disabled", 3, Color3.new(0, 1, 0))
 	end
+end
+
+function InventoryUI:resetInventory()
+	MetaService.Self:Fire(
+		"Notification",
+		"Create",
+		"Resetting inventory...",
+		3,
+		Color3.new(1, 0.5, 0)
+	)
+	self.inventoryClientService:requestResetInventory()
 end
 
 function InventoryUI:updateDeleteModeButton()

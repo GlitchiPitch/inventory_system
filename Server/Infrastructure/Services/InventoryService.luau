@@ -48,6 +48,24 @@ function InventoryService:getPlayerInventory(userId)
 end
 
 ---@param userId string
+---@return boolean
+function InventoryService:resetPlayerInventory(userId)
+	local metaPlayer = self.inventoryRepository:_getMetaPlayer(userId)
+	if not metaPlayer then
+		return false
+	end
+
+	-- Очистить данные инвентаря
+	metaPlayer.Data.Inventory.Accessories = {}
+
+	-- Создать новый пустой инвентарь
+	local emptyInventory = self.inventoryRepository.InventoryEntity.new()
+	self.inventoryRepository:save(userId, emptyInventory)
+
+	return true
+end
+
+---@param userId string
 ---@param itemId string
 ---@param count number
 ---@return boolean, string?

@@ -13,6 +13,7 @@
 - ✅ **Item Bonus Display**: Basic bonus icons and values display in inventory slots
 - ✅ **Inventory Data Structure Refactoring**: Migrated from dictionary-based to array-based Accessories format with simplified item model
 - ✅ **Repository Code Cleanup**: Extracted helper methods in InventoryRepository (_getMetaPlayer, _ensureEquippedArrays, etc.)
+- ✅ **Reset Inventory Feature**: Complete inventory reset functionality with UI button and server-side implementation
 
 ## Next Development Phase (v0.0.9)
 

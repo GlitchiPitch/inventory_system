@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.13] - 2025-11-24
+
+### Added
+- **Reset Inventory Feature**: Added complete inventory reset functionality for players
+- **ResetInventory Remote Event**: New client-server event for inventory reset operations
+- **Reset Button UI**: Added reset button to equipment panel with user confirmation
+
+### Changed
+- **Client Inventory Service**: Extended with InventoryReset event handler and requestResetInventory method
+- **Server Inventory Service**: Added resetPlayerInventory method with proper data cleanup and persistence
+- **Inventory Remote Service**: Implemented handleResetInventory with success/error feedback
+
+### Technical Details
+- **Data Cleanup**: Reset functionality clears Accessories array and creates fresh inventory entity
+- **User Feedback**: MetaService notifications inform players about reset operations
+- **State Synchronization**: Automatic inventory state update after reset via existing GetInventory flow
+
+### Next Steps
+- Complete drag-and-drop inventory UI implementation
+- Add item rarity colors and visual effects
+- Implement comprehensive item tooltips with stats
+- Create inventory filtering and search system
+
 ## [0.0.12] - 2025-11-24
 
 ### Refactored
