@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.16] - 2025-11-28
+
+### Fixed
+- **Critical Migration Bug**: Fixed data migration logic that was overwriting existing inventory data with empty arrays
+- **Inventory Data Loss Prevention**: Added protection against migration running on data already in new format
+- **Legacy Data Detection**: Improved legacy data detection to check table contents, not just existence
+
+### Changed
+- **Migration Logic**: Enhanced migrateLegacyData to prevent data corruption during version upgrades
+- **Data Safety**: Added safeguards to preserve existing Accessories data when migration conditions are met
+
+### Technical Details
+- **Migration Conditions**: Changed from presence-based to content-based legacy data detection
+- **Data Protection**: Added check for existing Accessories array to prevent overwrites
+- **Logging**: Added debug logging for migration decision process
+
+### Next Steps
+- Complete drag-and-drop inventory UI implementation
+- Add item rarity colors and visual effects
+- Implement comprehensive item tooltips with stats
+- Create inventory filtering and search system
+
 ## [0.0.15] - 2025-11-28
 
 ### Removed

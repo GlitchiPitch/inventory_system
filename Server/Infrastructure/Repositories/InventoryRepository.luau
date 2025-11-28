@@ -21,7 +21,6 @@ function InventoryRepository.new(logger, InventoryEntity, amuletsList, ringsList
 	self.logger = logger
 	self.InventoryEntity = InventoryEntity
 	self.amuletsList = amuletsList or {}
-	-- self.fruitsList = fruitsList or {}
 	self.ringsList = ringsList or {}
 	self._cache = {}
 	return self
@@ -422,12 +421,26 @@ function InventoryRepository:migrateLegacyData(userId)
 	end
 
 	-- Проверить, есть ли старые таблицы для миграции
-	local hasLegacyData = inventoryData.Rings or inventoryData.Amulets or
-	                      inventoryData.EquippedRings or inventoryData.EquippedAmulets
+	local hasLegacyData = (inventoryData.Rings and #inventoryData.Rings > 0) or
+	                      (inventoryData.Amulets and #inventoryData.Amulets > 0) or
+	                      (inventoryData.EquippedRings and #inventoryData.EquippedRings > 0) or
+	                      (inventoryData.EquippedAmulets and #inventoryData.EquippedAmulets > 0)
+
+	self.logger:debug("Migration check - hasLegacyData: " .. tostring(hasLegacyData) ..
+	                 ", Accessories count: " .. tostring(inventoryData.Accessories and #inventoryData.Accessories or 0))
+
+	-- Если Accessories уже содержит данные, миграция не нужна
+	if inventoryData.Accessories and #inventoryData.Accessories > 0 then
+		self.logger:debug("Migration skipped - data already in new format")
+		return true, "Data already in new format"
+	end
 
 	if not hasLegacyData then
+		self.logger:debug("Migration skipped - no legacy data to migrate")
 		return true, "No legacy data to migrate"
 	end
+
+	self.logger:debug("Migration starting - converting legacy data")
 
 
 	-- Создать новый массив Accessories

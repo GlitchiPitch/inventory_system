@@ -16,6 +16,7 @@
 - ✅ **Reset Inventory Feature**: Complete inventory reset functionality with UI button and server-side implementation
 - ✅ **Equipment Slot Bug Fix**: Fixed critical bug where equipping identical items would equip all instances simultaneously
 - ✅ **Code Cleanup**: Removed debug print/warn statements from all services and repositories
+- ✅ **Critical Migration Bug Fix**: Fixed data migration logic that was overwriting existing inventory data
 
 ## Next Development Phase (v0.0.9)
 
