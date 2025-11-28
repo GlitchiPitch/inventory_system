@@ -7,7 +7,6 @@ local Players = game:GetService("Players")
 ---@field _cache table<string, InventoryEntity>
 ---@field InventoryEntity InventoryEntity
 ---@field amuletsList table<string, string>
----@field fruitsList table<string, string>
 ---@field ringsList table<string, string>
 local InventoryRepository = {}
 InventoryRepository.__index = InventoryRepository
@@ -15,15 +14,14 @@ InventoryRepository.__index = InventoryRepository
 ---@param logger Logger
 ---@param InventoryEntity InventoryEntity
 ---@param amuletsList table<string, string>
----@param fruitsList table<string, string>
 ---@param ringsList table<string, string>
 ---@return InventoryRepository
-function InventoryRepository.new(logger, InventoryEntity, amuletsList, fruitsList, ringsList)
+function InventoryRepository.new(logger, InventoryEntity, amuletsList, ringsList)
 	local self = setmetatable({}, InventoryRepository)
 	self.logger = logger
 	self.InventoryEntity = InventoryEntity
 	self.amuletsList = amuletsList or {}
-	self.fruitsList = fruitsList or {}
+	-- self.fruitsList = fruitsList or {}
 	self.ringsList = ringsList or {}
 	self._cache = {}
 	return self
@@ -59,14 +57,11 @@ function InventoryRepository:_getSlotNameForItem(item)
 	local itemType = self:_getItemType(item.name)
 	if itemType == "ring" then
 		-- Для колец используем правую руку по умолчанию (как в клиенте)
-		self.logger:debug("InventoryRepository", "Assigning rightHand slot for ring item:", item.name)
 		return "rightHand"
 	elseif itemType == "amulet" then
 		-- Для амулетов используем шлем
-		self.logger:debug("InventoryRepository", "Assigning helmet slot for amulet item:", item.name)
 		return "helmet"
 	else
-		self.logger:debug("InventoryRepository", "No slot assigned for item:", item.name, "type:", itemType)
 		return nil -- Для фруктов и других предметов слоты могут не быть нужны
 	end
 end
@@ -149,7 +144,6 @@ end
 function InventoryRepository:checkItemType(itemType, itemName)
 	local typeLists = {
 		amulet = self.amuletsList,
-		fruit = self.fruitsList,
 		ring = self.ringsList
 	}
 	return typeLists[itemType] and typeLists[itemType][itemName] ~= nil
@@ -202,6 +196,11 @@ function InventoryRepository:getByPlayerId(userId)
 	local itemCounts = {}
 
 	for _, item in ipairs(accessoriesData) do
+		-- Пропускаем фрукты - они не должны отображаться в инвентаре
+		if self:checkIsFruit(item.name) then
+			continue
+		end
+
 		-- Все предметы в массиве принадлежат игроку
 		itemCounts[item.name] = (itemCounts[item.name] or 0) + 1
 		if item.equipped then
@@ -211,11 +210,9 @@ function InventoryRepository:getByPlayerId(userId)
 				if item.slotId then
 					-- У нас есть конкретный slotId
 					equippedItems[slotName] = item.slotId
-					self.logger:debug("InventoryRepository", "Loading equipped item:", item.name, "slotId:", item.slotId, "in slot:", slotName)
 				else
 					-- Fallback: определить slotId на основе типа предмета
 					equippedItems[slotName] = item.name .. "_1"
-					self.logger:debug("InventoryRepository", "Loading equipped item (fallback):", item.name, "in slot:", slotName, "slotId:", item.name .. "_1")
 				end
 			end
 		end
@@ -270,7 +267,6 @@ function InventoryRepository:save(userId, inventory)
 			slotName = slotName,
 			slotId = slotId
 		}
-		self.logger:debug("InventoryRepository", "Preparing to save equipped item:", slotId, "in slot:", slotName)
 	end
 
 	-- Создать словарь предметов в инвентаре с их количеством
@@ -305,7 +301,6 @@ function InventoryRepository:save(userId, inventory)
 			if isEquipped then
 				itemData.slotName = equippedInfo.slotName
 				itemData.slotId = equippedInfo.slotId
-				self.logger:debug("InventoryRepository", "Saving equipped item:", itemName, "slotId:", slotId, "slotName:", equippedInfo.slotName)
 			end
 
 			-- Добавить level если есть в существующих данных
@@ -320,6 +315,7 @@ function InventoryRepository:save(userId, inventory)
 
 	-- Сохранить обновленный массив
 	metaPlayer.Data.Inventory.Accessories = newAccessories
+	metaPlayer:Refresh()
 end
 
 ---@param userId string
@@ -412,30 +408,78 @@ function InventoryRepository:clearCache(userId)
 	self._cache[userId] = nil
 end
 
-return InventoryRepository
+---@param userId string
+---@return boolean, string?
+function InventoryRepository:migrateLegacyData(userId)
+	local metaPlayer = self:_getMetaPlayer(userId)
+	if not metaPlayer then
+		return false, "Player not found"
+	end
 
--- Пример новой структуры данных Accessories в metaPlayer.Data.Inventory.Accessories
--- Теперь данные хранятся в виде массива предметов с флагом equipped
--- Тип предмета определяется динамически по имени
--- Все предметы в массиве принадлежат игроку (owned = true по умолчанию)
--- local Accessories = {
--- 	{
--- 		name = "Amulet_1",
--- 		level = 1,
--- 		equipped = true
--- 	},
--- 	{
--- 		name = "Amulet_1", -- второй экземпляр того же предмета
--- 		level = 1,
--- 		equipped = false
--- 	},
--- 	{
--- 		name = "Fruit_1",
--- 		equipped = false
--- 	},
--- 	{
--- 		name = "Ring_1",
--- 		level = 1,
--- 		equipped = false
--- 	}
--- }
+	local inventoryData = metaPlayer.Data.Inventory
+	if not inventoryData then
+		return false, "Inventory data not found"
+	end
+
+	-- Проверить, есть ли старые таблицы для миграции
+	local hasLegacyData = inventoryData.Rings or inventoryData.Amulets or
+	                      inventoryData.EquippedRings or inventoryData.EquippedAmulets
+
+	if not hasLegacyData then
+		return true, "No legacy data to migrate"
+	end
+
+
+	-- Создать новый массив Accessories
+	local newAccessories = {}
+
+	-- Функция для добавления предметов из старой таблицы
+	local function addItemsFromTable(items, itemType, equippedTable)
+		if not items then return end
+
+		local equippedMap = {}
+		if equippedTable then
+			for _, equippedItem in ipairs(equippedTable) do
+				equippedMap[equippedItem] = true
+			end
+		end
+
+		for _, item in ipairs(items) do
+			local isEquipped = equippedMap[item] == true
+
+			local itemData = {
+				name = item,
+				type = itemType,
+				equipped = isEquipped
+			}
+
+			-- Если есть уровень в старых данных, сохранить его
+			if type(item) == "table" and item.level then
+				itemData.level = item.level
+			end
+
+			table.insert(newAccessories, itemData)
+
+		end
+	end
+
+	-- Миграция колец
+	addItemsFromTable(inventoryData.Rings, "ring", inventoryData.EquippedRings)
+
+	-- Миграция амулетов
+	addItemsFromTable(inventoryData.Amulets, "amulet", inventoryData.EquippedAmulets)
+
+	-- Сохранить новую структуру
+	inventoryData.Accessories = newAccessories
+
+	-- Очистить старые таблицы
+	inventoryData.Rings = nil
+	inventoryData.Amulets = nil
+	inventoryData.EquippedRings = nil
+	inventoryData.EquippedAmulets = nil
+
+
+	return true, "Migration completed successfully"
+end
+
+return InventoryRepository

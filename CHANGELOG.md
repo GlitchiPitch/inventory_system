@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.15] - 2025-11-28
+
+### Removed
+- **Fruits System**: Complete removal of fruits inventory system and FruitsList data module
+- **Debug Logging**: Eliminated all debug print/warn statements from InventoryEntity, services, and repositories
+
+### Changed
+- **Data Module Cleanup**: Removed FruitsList dependency from Shared/Data/init.luau exports
+- **Code Cleanup**: Streamlined inventory equip/unequip operations by removing debug output
+- **Repository Optimization**: Reduced code verbosity while maintaining all functionality
+
+### Technical Details
+- **Data Structure**: Cleaned up shared data exports to remove unused FruitsList references
+- **Logging**: Removed excessive debug statements from core business logic methods
+- **Maintainability**: Improved code readability by eliminating debug noise from production code
+
+### Next Steps
+- Complete drag-and-drop inventory UI implementation
+- Add item rarity colors and visual effects
+- Implement comprehensive item tooltips with stats
+- Create inventory filtering and search system
+
 ## [0.0.14] - 2025-11-24
 
 ### Fixed

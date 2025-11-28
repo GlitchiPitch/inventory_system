@@ -6,6 +6,9 @@ local InventoryService = require(script.Services.InventoryService)
 
 local MetaService = require(game.StarterPlayer.StarterPlayerScripts.MetaService)
 
+MetaService.DataChanged:Connect(function(data)
+	print("data", data)
+end)
 
 ---@class InventorySystemClient
 ---@field shared InventorySystemShared
@@ -31,8 +34,7 @@ function Client:_registerServices()
 		local logger = container:resolve("Logger")
 		local amuletsList = data.AmuletsList
 		local ringsList = data.RingsList
-		local fruitsList = data.FruitsList
-		return InventoryService.new(remoteEventService, amuletsList, ringsList, fruitsList, logger)
+		return InventoryService.new(remoteEventService, amuletsList, ringsList, logger)
 	end)
 
 	-- Регистрация InventoryUI
@@ -47,11 +49,10 @@ function Client:_registerServices()
 		local EquipmentSlotEntity = domain.entities.EquipmentSlot
 		local ItemEntity = domain.entities.Item
 		local amuletsList = data.AmuletsList
-		local fruitsList = data.FruitsList
 		local ringsList = data.RingsList
 		local bonusIcons = data.BonusIcons
 
-		return InventoryUI.new(inventoryClientService, amuletsList, fruitsList, ringsList, bonusIcons, EquipmentSlotEntity, ItemEntity, logger)
+		return InventoryUI.new(inventoryClientService, amuletsList, ringsList, bonusIcons, EquipmentSlotEntity, ItemEntity, logger)
 	end)
 end
 

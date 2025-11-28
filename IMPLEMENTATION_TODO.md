@@ -8,13 +8,14 @@
 - ✅ **Documentation**: MetaService guide and project plan completed
 - ✅ **Inventory Data Structure**: Refactored to array format for UI compatibility
 - ✅ **Basic Equipment Logic**: Server-side equip/unequip validation implemented
-- ✅ **Fruits System**: 20 different fruits with asset IDs implemented
+- ✅ ~~Fruits System: 20 different fruits with asset IDs implemented~~ (removed in v0.0.15)
 - ✅ **Network Synchronization**: Complete remote event system for inventory operations
 - ✅ **Item Bonus Display**: Basic bonus icons and values display in inventory slots
 - ✅ **Inventory Data Structure Refactoring**: Migrated from dictionary-based to array-based Accessories format with simplified item model
 - ✅ **Repository Code Cleanup**: Extracted helper methods in InventoryRepository (_getMetaPlayer, _ensureEquippedArrays, etc.)
 - ✅ **Reset Inventory Feature**: Complete inventory reset functionality with UI button and server-side implementation
 - ✅ **Equipment Slot Bug Fix**: Fixed critical bug where equipping identical items would equip all instances simultaneously
+- ✅ **Code Cleanup**: Removed debug print/warn statements from all services and repositories
 
 ## Next Development Phase (v0.0.9)
 
@@ -63,7 +64,7 @@
 - [ ] **Item Tooltips**: Detailed item information display (basic bonus display implemented)
 
 ## Technical Debt
-- [x] **Code Cleanup**: Removed debug print/warn statements from services and repositories
+- [x] **Code Cleanup**: Removed debug print/warn statements from services and repositories (completed in v0.0.15)
 - [x] **Data Structure Optimization**: Refactored inventory from array to dictionary for O(1) lookup performance
 - [x] **InventoryRepository Refactoring**: Eliminated duplicate code by extracting helper methods (_getMetaPlayer, _ensureEquippedArrays, etc.)
 - [x] **Unified Item Type Checking**: Replaced separate checkIs* methods with universal checkItemType method

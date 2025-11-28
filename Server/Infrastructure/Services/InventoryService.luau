@@ -13,18 +13,16 @@ InventoryService.__index = InventoryService
 ---@param inventoryRepository InventoryRepository
 ---@param amuletsList table<string, string>
 ---@param ringsList table<string, string>
----@param fruitsList table<string, string>
 ---@param EquipmentSlot EquipmentSlotEntity?
 ---@return InventoryService
-function InventoryService.new(logger, inventoryRepository, amuletsList, ringsList, fruitsList, EquipmentSlot)
+function InventoryService.new(logger, inventoryRepository, amuletsList, ringsList, EquipmentSlot)
 	local self = setmetatable({}, InventoryService)
 	self.logger = logger
 	self.inventoryRepository = inventoryRepository
 	self.amuletsList = amuletsList or {}
 	self.ringsList = ringsList or {}
-	self.fruitsList = fruitsList or {}
 
-	-- Объединяем списки предметов в один словарь для валидации
+	-- Объединяем списки предметов в один словарь для валидации (фрукты не включаем, так как они не отображаются в инвентаре)
 	self.allItemIcons = {}
 	for itemName, iconId in pairs(amuletsList or {}) do
 		self.allItemIcons[itemName] = iconId
@@ -32,9 +30,7 @@ function InventoryService.new(logger, inventoryRepository, amuletsList, ringsLis
 	for itemName, iconId in pairs(ringsList or {}) do
 		self.allItemIcons[itemName] = iconId
 	end
-	for itemName, iconId in pairs(fruitsList or {}) do
-		self.allItemIcons[itemName] = iconId
-	end
+	-- Фрукты убраны из allItemIcons, так как они не отображаются в инвентаре
 
 	self.EquipmentSlot = EquipmentSlot
 	return self
@@ -43,6 +39,14 @@ end
 ---@param userId string
 ---@return InventoryEntity?
 function InventoryService:getPlayerInventory(userId)
+	-- Автоматическая миграция данных при первом обращении к инвентарю
+	local migrationSuccess, migrationMessage = self.inventoryRepository:migrateLegacyData(userId)
+	if not migrationSuccess then
+	else
+		if migrationMessage ~= "No legacy data to migrate" then
+		end
+	end
+
 	local inventory = self.inventoryRepository:getByPlayerId(userId)
 	return inventory
 end
@@ -175,7 +179,6 @@ function InventoryService:equipItem(userId, slotId, slotName)
 	-- Проверить, что слот свободен
 	local equippedItem = inventory:getEquippedItem(slot)
 	if equippedItem then
-		self.logger:warn("InventoryService", "Cannot equip item - slot", slotName, "is already occupied by:", equippedItem)
 		return false, "Equipment slot is already occupied"
 	end
 
@@ -184,12 +187,6 @@ function InventoryService:equipItem(userId, slotId, slotName)
 		return false, "Unknown item"
 	end
 
-	-- Проверить, что предмет не является фруктом
-	if self.fruitsList[itemName] then
-		local metaPlayer = MetaService.Class.Player:Get(game.Players:GetPlayerByUserId(tonumber(userId)))
-		metaPlayer:Notification("Fruits cannot be equipped", 3, Color3.new(1, 0.239215, 0.239215))
-		return false, "Fruits cannot be equipped"
-	end
 
 	-- Проверить совместимость слота с типом предмета
 	local itemType = self:getItemType(itemName)
@@ -199,11 +196,8 @@ function InventoryService:equipItem(userId, slotId, slotName)
 
 	local success = self.inventoryRepository:equipItem(userId, slotId, slot)
 	if not success then
-		self.logger:error("InventoryService", "Failed to equip item in repository")
 		return false, "Failed to equip item"
 	end
-
-	self.logger:info("InventoryService", "Successfully equipped item:", slotId, "in slot:", slotName)
 	return true, nil
 end
 
@@ -211,37 +205,27 @@ end
 ---@param slotName string
 ---@return boolean, string?
 function InventoryService:unequipItem(userId, slotName)
-	self.logger:info("InventoryService", "Unequipping item for user", userId, "from slot:", slotName)
-
 	local inventory = self.inventoryRepository:getByPlayerId(userId)
 	if not inventory then
-		self.logger:error("InventoryService", "Player inventory not found for user:", userId)
 		return false, "Player inventory not found"
 	end
 
 	-- Получить слот экипировки
 	local slot = self.EquipmentSlot:getByName(slotName)
 	if not slot then
-		self.logger:error("InventoryService", "Invalid equipment slot:", slotName)
 		return false, "Invalid equipment slot"
 	end
 
 	-- Проверить, есть ли что-то в слоте
 	local equippedItem = inventory:getEquippedItem(slot)
 	if not equippedItem then
-		self.logger:warn("InventoryService", "No item equipped in slot:", slotName)
 		return false, "No item equipped in this slot"
 	end
 
-	self.logger:info("InventoryService", "Unequipping item:", equippedItem, "from slot:", slotName)
-
 	local success, unequippedItem = self.inventoryRepository:unequipItem(userId, slot)
 	if not success then
-		self.logger:error("InventoryService", "Failed to unequip item from repository")
 		return false, "Failed to unequip item"
 	end
-
-	self.logger:info("InventoryService", "Successfully unequipped item:", unequippedItem)
 	return true, unequippedItem
 end
 
@@ -252,8 +236,6 @@ function InventoryService:getItemType(itemId)
 		return "amulet"
 	elseif self.ringsList[itemId] then
 		return "ring"
-	elseif self.fruitsList[itemId] then
-		return "weapon" -- фрукты считаем оружием
 	end
 
 	return "weapon" -- по умолчанию

@@ -1,5 +1,4 @@
 local AmuletsList = require(script.AmuletsList)
-local FruitsList = require(script.FruitsList)
 local RingsList = require(script.RingsList)
 
 local BonusIcons = {
@@ -11,7 +10,6 @@ local BonusIcons = {
 ---@class InventorySystemData
 local Data = {
     AmuletsList = AmuletsList,
-    FruitsList = FruitsList,
     RingsList = RingsList,
     BonusIcons = BonusIcons,
 }
