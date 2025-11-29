@@ -1,5 +1,5 @@
 local Players = game:GetService("Players")
-local MetaService = require(game.StarterPlayer.StarterPlayerScripts.MetaService)
+local MetaService = require(script.Parent.Parent.Parent.Parent.Parent)
 ---@class InventoryUI
 ---@field screenGui ScreenGui
 ---@field mainFrame Frame
@@ -24,16 +24,27 @@ InventoryUI.__index = InventoryUI
 ---@param inventoryClientService InventoryClientService
 ---@param amuletsList AmuletsList
 ---@param ringsList RingsList
+---@param fruitsList FruitsList
 ---@param bonusIcons table
 ---@param EquipmentSlotEntity EquipmentSlotEntity
 ---@param ItemEntity ItemEntity
 ---@param logger LoggerService
 ---@return InventoryUI
-function InventoryUI.new(inventoryClientService, amuletsList, ringsList, bonusIcons, EquipmentSlotEntity, ItemEntity, logger)
+function InventoryUI.new(
+	inventoryClientService,
+	amuletsList,
+	ringsList,
+	fruitsList,
+	bonusIcons,
+	EquipmentSlotEntity,
+	ItemEntity,
+	logger
+)
 	local self = setmetatable({}, InventoryUI)
 	self.inventoryClientService = inventoryClientService
 	self.amuletsList = amuletsList
 	self.ringsList = ringsList
+	self.fruitsList = fruitsList
 	self.bonusIcons = bonusIcons
 	self.logger = logger
 	-- Объединяем списки предметов в один словарь
@@ -43,14 +54,21 @@ function InventoryUI.new(inventoryClientService, amuletsList, ringsList, bonusIc
 		self.allItemIcons[itemName] = itemData.icon
 		self.allItemBonuses[itemName] = {
 			bonusType = itemData.bonusType,
-			bonusValue = itemData.bonusValue
+			bonusValue = itemData.bonusValue,
 		}
 	end
 	for itemName, itemData in pairs(ringsList) do
 		self.allItemIcons[itemName] = itemData.icon
 		self.allItemBonuses[itemName] = {
 			bonusType = itemData.bonusType,
-			bonusValue = itemData.bonusValue
+			bonusValue = itemData.bonusValue,
+		}
+	end
+	for itemName, itemData in pairs(fruitsList) do
+		self.allItemIcons[itemName] = itemData.icon
+		self.allItemBonuses[itemName] = {
+			bonusType = itemData.bonusType,
+			bonusValue = itemData.bonusValue,
 		}
 	end
 
@@ -78,7 +96,6 @@ function InventoryUI:createUI()
 	self.inventoryFrame = self.mainFrame.ScrollingFrame
 	self.equipmentFrame = self.mainFrame.EquipmentFrame
 	self.slotTemplate = self.mainFrame.ScrollingFrame.Template
-
 
 	-- Найти кнопку режима удаления
 	self.deleteModeButton = self.equipmentFrame:FindFirstChild("DeleteModeButton")
@@ -144,13 +161,7 @@ function InventoryUI:toggleDeleteMode()
 end
 
 function InventoryUI:resetInventory()
-	MetaService.Self:Fire(
-		"Notification",
-		"Create",
-		"Resetting inventory...",
-		3,
-		Color3.new(1, 0.5, 0)
-	)
+	MetaService.Self:Fire("Notification", "Create", "Resetting inventory...", 3, Color3.new(1, 0.5, 0))
 	self.inventoryClientService:requestResetInventory()
 end
 
@@ -188,6 +199,15 @@ function InventoryUI:createSlots(inventoryData)
 	-- Очищаем существующие слоты перед созданием новых
 	self:clearSlots()
 
+	-- Получаем данные игрока для проверки экипированного фрукта
+	local playerData = MetaService.Data
+	local equippedFruit = playerData and playerData.Fruit or ""
+
+	-- Если есть экипированный фрукт и его нет в инвентаре, добавляем его для отображения
+	if equippedFruit ~= "" and not inventoryData.inventorySlots[equippedFruit] then
+		inventoryData.inventorySlots[equippedFruit] = { true } -- Добавляем один слот для фрукта
+	end
+
 	local slotIndex = 0
 	for itemName, itemSlots in pairs(inventoryData.inventorySlots) do
 		-- Для каждого экземпляра предмета создаем отдельный слот
@@ -215,6 +235,12 @@ function InventoryUI:createSlots(inventoryData)
 						end
 					end
 				end
+
+				-- Дополнительная проверка для фруктов: если фрукт экипирован в playerData.Fruit
+				if not isEquipped and equippedFruit ~= "" and itemName == equippedFruit then
+					isEquipped = true
+				end
+
 				checkmark.Visible = isEquipped
 			end
 
@@ -254,7 +280,6 @@ function InventoryUI:clearSlots()
 end
 
 function InventoryUI:setupEventHandlers()
-
 	-- Обработчик обновления инвентаря
 	self.inventoryClientService:setOnInventoryUpdated(function(inventoryData)
 		self:createSlots(inventoryData)
@@ -275,7 +300,6 @@ function InventoryUI:setupEventHandlers()
 end
 
 function InventoryUI:onSlotClicked(slotId)
-
 	if self.isEquipmentWindowOpen then
 		return
 	end
@@ -290,7 +314,6 @@ function InventoryUI:onSlotClicked(slotId)
 	if not itemName then
 		return
 	end
-
 
 	if self.isDeleteMode then
 		-- Режим удаления - удаляем один экземпляр предмета
@@ -442,7 +465,6 @@ function InventoryUI:onEquipmentSlotClicked(slotName)
 end
 
 function InventoryUI:onItemEquipped(slotId)
-
 	-- Находим конкретный UI слот и показываем Checkmark
 	local slotButton = self.itemSlots[slotId]
 	if slotButton then
@@ -486,7 +508,6 @@ function InventoryUI:updateEquipmentSlots()
 		local slotButton = slotEntity.slotButton
 		local equippedIcon = slotButton and slotButton:FindFirstChild("EquippedIcon")
 		local equippedItemId = inventoryData.equippedItems[slotName]
-
 
 		if equippedIcon then
 			if equippedItemId then

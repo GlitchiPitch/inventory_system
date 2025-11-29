@@ -16,12 +16,13 @@ InventoryRepository.__index = InventoryRepository
 ---@param amuletsList table<string, string>
 ---@param ringsList table<string, string>
 ---@return InventoryRepository
-function InventoryRepository.new(logger, InventoryEntity, amuletsList, ringsList)
+function InventoryRepository.new(logger, InventoryEntity, amuletsList, ringsList, fruitsList)
 	local self = setmetatable({}, InventoryRepository)
 	self.logger = logger
 	self.InventoryEntity = InventoryEntity
 	self.amuletsList = amuletsList or {}
 	self.ringsList = ringsList or {}
+	self.fruitsList = fruitsList or {}
 	self._cache = {}
 	return self
 end
@@ -143,7 +144,8 @@ end
 function InventoryRepository:checkItemType(itemType, itemName)
 	local typeLists = {
 		amulet = self.amuletsList,
-		ring = self.ringsList
+		ring = self.ringsList,
+		fruit = self.fruitsList
 	}
 	return typeLists[itemType] and typeLists[itemType][itemName] ~= nil
 end
@@ -195,11 +197,6 @@ function InventoryRepository:getByPlayerId(userId)
 	local itemCounts = {}
 
 	for _, item in ipairs(accessoriesData) do
-		-- Пропускаем фрукты - они не должны отображаться в инвентаре
-		if self:checkIsFruit(item.name) then
-			continue
-		end
-
 		-- Все предметы в массиве принадлежат игроку
 		itemCounts[item.name] = (itemCounts[item.name] or 0) + 1
 		if item.equipped then
@@ -314,6 +311,7 @@ function InventoryRepository:save(userId, inventory)
 
 	-- Сохранить обновленный массив
 	metaPlayer.Data.Inventory.Accessories = newAccessories
+	
 	metaPlayer:Refresh()
 end
 

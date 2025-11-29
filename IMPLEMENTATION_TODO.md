@@ -8,7 +8,7 @@
 - ✅ **Documentation**: MetaService guide and project plan completed
 - ✅ **Inventory Data Structure**: Refactored to array format for UI compatibility
 - ✅ **Basic Equipment Logic**: Server-side equip/unequip validation implemented
-- ✅ ~~Fruits System: 20 different fruits with asset IDs implemented~~ (removed in v0.0.15)
+- ✅ **Fruits System**: 18 different fruits with asset IDs implemented (restored in v0.0.17)
 - ✅ **Network Synchronization**: Complete remote event system for inventory operations
 - ✅ **Item Bonus Display**: Basic bonus icons and values display in inventory slots
 - ✅ **Inventory Data Structure Refactoring**: Migrated from dictionary-based to array-based Accessories format with simplified item model
@@ -17,6 +17,7 @@
 - ✅ **Equipment Slot Bug Fix**: Fixed critical bug where equipping identical items would equip all instances simultaneously
 - ✅ **Code Cleanup**: Removed debug print/warn statements from all services and repositories
 - ✅ **Critical Migration Bug Fix**: Fixed data migration logic that was overwriting existing inventory data
+- ✅ **Fruits System Restoration**: Complete restoration of fruits inventory system with updated fruit list and equipped fruit display logic
 
 ## Next Development Phase (v0.0.9)
 

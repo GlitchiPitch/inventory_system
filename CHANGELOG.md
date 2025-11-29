@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.17] - 2025-11-29
+
+### Added
+- **Fruits System Restoration**: Complete restoration of fruits inventory system with updated fruit list
+- **New Fruits Collection**: Added 18 diverse fruits with different rarities (Common, Uncommon, Rare, Epic, Legendary, Mythical, Divine)
+- **Equipped Fruit Display**: Fruits equipped via player data (Fruit field) now display in inventory with checkmark
+- **Fruit Checkmark Logic**: Visual indication for equipped fruits in inventory slots
+
+### Changed
+- **FruitsList Data Structure**: Updated FruitsList.luau with new fruit collection including Pebble, Sprout, Gleam, Gale, Spring, Quartz, Spike, Boulder, Pack, Tesla, Horizon, Magma, Midas, Titan, Void, Soul, and Singularity fruits
+- **Inventory UI Enhancement**: Modified InventoryUI:createSlots() to check player Fruit data and display equipped fruits
+- **Data Integration**: Connected player Fruit field with inventory display system
+
+### Technical Details
+- **Fruit Equipment Logic**: Added player data checking (MetaService.Data.Fruit) in inventory slot creation
+- **Visual Feedback**: Checkmark display for fruits equipped through player data field
+- **Data Structure**: FruitsList uses consistent icon, bonusType, bonusValue format matching other item types
+
+### Next Steps
+- Complete drag-and-drop inventory UI implementation
+- Add item rarity colors and visual effects
+- Implement comprehensive item tooltips with stats
+- Create inventory filtering and search system
+
 ## [0.0.16] - 2025-11-28
 
 ### Fixed
