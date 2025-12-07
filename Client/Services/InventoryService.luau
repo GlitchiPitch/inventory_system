@@ -9,7 +9,7 @@ InventoryClientService.__index = InventoryClientService
 ---@param remoteEventService RemoteEventService
 ---@param logger LoggerService
 ---@return InventoryClientService
-function InventoryClientService.new(remoteEventService, amuletsList, ringsList, fruitsList, logger)
+function InventoryClientService.new(remoteEventService, amuletsList, ringsList, fruitsList, bootsList, logger)
 	local self = setmetatable({}, InventoryClientService)
 	self.remoteEventService = remoteEventService
 	self._inventoryData = nil
@@ -18,6 +18,7 @@ function InventoryClientService.new(remoteEventService, amuletsList, ringsList, 
 	self._amuletsList = amuletsList
 	self._ringsList = ringsList
 	self._fruitsList = fruitsList
+	self._bootsList = bootsList
 	self.logger = logger
 	self:setupEventHandlers()
 	return self
@@ -204,6 +205,8 @@ function InventoryClientService:getItemType(itemId)
 		return "ring"
 	elseif self._fruitsList[itemId] then
 		return "fruit"
+	elseif self._bootsList[itemId] then
+		return "boots"
 	end
 
 	return "weapon" -- по умолчанию

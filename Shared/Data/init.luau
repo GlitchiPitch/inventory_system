@@ -1,6 +1,7 @@
 local AmuletsList = require(script.AmuletsList)
 local RingsList = require(script.RingsList)
 local FruitsList = require(script.FruitsList)
+local BootsList = require(script.BootsList)
 
 local BonusIcons = {
     Energy = "rbxassetid://95399152641597",
@@ -13,6 +14,7 @@ local Data = {
     AmuletsList = AmuletsList,
     RingsList = RingsList,
     FruitsList = FruitsList,
+    BootsList = BootsList,
     BonusIcons = BonusIcons,
 }
 

@@ -9,7 +9,8 @@ EquipmentSlotEntity.__index = EquipmentSlotEntity
 EquipmentSlotEntity.SlotName = {
     LEFT_HAND = "leftHand",
     RIGHT_HAND = "rightHand",
-    HELMET = "helmet"
+    HELMET = "helmet",
+    BOOTS = "boots"
 }
 
 ---@param name string
@@ -70,6 +71,12 @@ EquipmentSlotEntity.HELMET = EquipmentSlotEntity.new(
     {"amulet"}
 )
 
+EquipmentSlotEntity.BOOTS = EquipmentSlotEntity.new(
+    EquipmentSlotEntity.SlotName.BOOTS,
+    "Boots",
+    {"boots"}
+)
+
 ---@param slotName string
 ---@return EquipmentSlotEntity?
 function EquipmentSlotEntity:getByName(slotName)
@@ -79,6 +86,8 @@ function EquipmentSlotEntity:getByName(slotName)
         return EquipmentSlotEntity.RIGHT_HAND
     elseif slotName == EquipmentSlotEntity.SlotName.HELMET then
         return EquipmentSlotEntity.HELMET
+    elseif slotName == EquipmentSlotEntity.SlotName.BOOTS then
+        return EquipmentSlotEntity.BOOTS
     end
     return nil
 end
@@ -88,7 +97,8 @@ function EquipmentSlotEntity.getAllSlots()
     return {
         EquipmentSlotEntity.RIGHT_HAND,
         EquipmentSlotEntity.LEFT_HAND,
-        EquipmentSlotEntity.HELMET
+        EquipmentSlotEntity.HELMET,
+        EquipmentSlotEntity.BOOTS
     }
 end
 

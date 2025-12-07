@@ -13,14 +13,16 @@ InventoryService.__index = InventoryService
 ---@param inventoryRepository InventoryRepository
 ---@param amuletsList table<string, string>
 ---@param ringsList table<string, string>
+---@param bootsList table<string, string>
 ---@param EquipmentSlot EquipmentSlotEntity?
 ---@return InventoryService
-function InventoryService.new(logger, inventoryRepository, amuletsList, ringsList, EquipmentSlot)
+function InventoryService.new(logger, inventoryRepository, amuletsList, ringsList, bootsList, EquipmentSlot)
 	local self = setmetatable({}, InventoryService)
 	self.logger = logger
 	self.inventoryRepository = inventoryRepository
 	self.amuletsList = amuletsList or {}
 	self.ringsList = ringsList or {}
+	self.bootsList = bootsList or {}
 
 	-- Объединяем списки предметов в один словарь для валидации (фрукты не включаем, так как они не отображаются в инвентаре)
 	self.allItemIcons = {}
@@ -28,6 +30,9 @@ function InventoryService.new(logger, inventoryRepository, amuletsList, ringsLis
 		self.allItemIcons[itemName] = iconId
 	end
 	for itemName, iconId in pairs(ringsList or {}) do
+		self.allItemIcons[itemName] = iconId
+	end
+	for itemName, iconId in pairs(bootsList or {}) do
 		self.allItemIcons[itemName] = iconId
 	end
 	-- Фрукты убраны из allItemIcons, так как они не отображаются в инвентаре
@@ -236,6 +241,8 @@ function InventoryService:getItemType(itemId)
 		return "amulet"
 	elseif self.ringsList[itemId] then
 		return "ring"
+	elseif self.bootsList[itemId] then
+		return "boots"
 	end
 
 	return "weapon" -- по умолчанию

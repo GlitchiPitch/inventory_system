@@ -35,6 +35,7 @@ function InventoryUI.new(
 	amuletsList,
 	ringsList,
 	fruitsList,
+	bootsList,
 	bonusIcons,
 	EquipmentSlotEntity,
 	ItemEntity,
@@ -55,6 +56,7 @@ function InventoryUI.new(
 		self.allItemBonuses[itemName] = {
 			bonusType = itemData.bonusType,
 			bonusValue = itemData.bonusValue,
+			rarity = itemData.rarity,
 		}
 	end
 	for itemName, itemData in pairs(ringsList) do
@@ -62,6 +64,7 @@ function InventoryUI.new(
 		self.allItemBonuses[itemName] = {
 			bonusType = itemData.bonusType,
 			bonusValue = itemData.bonusValue,
+			rarity = itemData.rarity,
 		}
 	end
 	for itemName, itemData in pairs(fruitsList) do
@@ -69,6 +72,16 @@ function InventoryUI.new(
 		self.allItemBonuses[itemName] = {
 			bonusType = itemData.bonusType,
 			bonusValue = itemData.bonusValue,
+			rarity = itemData.rarity,
+		}
+	end
+
+	for itemName, itemData in pairs(bootsList) do
+		self.allItemIcons[itemName] = itemData.icon
+		self.allItemBonuses[itemName] = {
+			bonusType = itemData.bonusType,
+			bonusValue = itemData.bonusValue,
+			rarity = itemData.rarity,
 		}
 	end
 
@@ -188,7 +201,6 @@ function InventoryUI:setupEquipmentSlots()
 			slotButton.MouseButton1Click:Connect(function()
 				self:onEquipmentSlotClicked(slotData.name)
 			end)
-		else
 		end
 
 		table.insert(self.equipmentSlots, slot)
@@ -214,6 +226,13 @@ function InventoryUI:createSlots(inventoryData)
 		for i, _ in ipairs(itemSlots) do
 			slotIndex = slotIndex + 1
 			local slot = self.slotTemplate:Clone()
+			local rarityColor = MetaService.Utils.Colors:GetRarityColor3(self.allItemBonuses[itemName].rarity)
+			slot.BackgroundColor3 = rarityColor
+			slot.BackgroundTransparency = 0
+			slot.RaritySymbol.BackgroundColor3 = rarityColor
+			slot.RarityBackground.BackgroundColor3 = rarityColor:Lerp(Color3.new(0, 0, 0), 0.5)
+			slot.RarityBackground.ImageColor3 = rarityColor:Lerp(Color3.new(0, 0, 0), 0.5)
+			slot.RaritySymbol.TextLabel.Text = self.allItemBonuses[itemName].rarity
 			local slotId = itemName .. "_" .. i -- Уникальный ID для каждого слота
 			slot.Name = slotId
 			slot.CountLabel.Text = "1" -- Каждый слот содержит 1 экземпляр

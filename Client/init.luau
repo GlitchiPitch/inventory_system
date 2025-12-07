@@ -31,7 +31,8 @@ function Client:_registerServices()
 		local amuletsList = data.AmuletsList
 		local ringsList = data.RingsList
 		local fruitsList = data.FruitsList
-		return InventoryService.new(remoteEventService, amuletsList, ringsList, fruitsList, logger)
+		local bootsList = data.BootsList
+		return InventoryService.new(remoteEventService, amuletsList, ringsList, fruitsList, bootsList, logger)
 	end)
 
 	-- Регистрация InventoryUI
@@ -48,6 +49,7 @@ function Client:_registerServices()
 		local amuletsList = data.AmuletsList
 		local ringsList = data.RingsList
 		local fruitsList = data.FruitsList
+		local bootsList = data.BootsList
 		local bonusIcons = data.BonusIcons
 
 		return InventoryUI.new(
@@ -55,6 +57,7 @@ function Client:_registerServices()
 			amuletsList,
 			ringsList,
 			fruitsList,
+			bootsList,
 			bonusIcons,
 			EquipmentSlotEntity,
 			ItemEntity,

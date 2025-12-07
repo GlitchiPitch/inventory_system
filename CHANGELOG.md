@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/specification/v2.0.0.html).
 
+## [0.0.18] - 2025-12-07
+
+### Added
+- **Boots Equipment System**: Complete implementation of boots equipment slot with dedicated BOOTS slot
+- **Boots Item Type**: Added BOOTS item type to ItemEntity with equipment compatibility
+- **Boots Data Integration**: Connected BootsList data with inventory and equipment systems
+- **Equipment Slot Expansion**: Added BOOTS slot to EquipmentSlotEntity with boots-only compatibility
+
+### Changed
+- **Equipment System Architecture**: Extended equipment slots from 3 to 4 slots (leftHand, rightHand, helmet, boots)
+- **Item Type Validation**: Updated client and server inventory services to recognize boots item type
+- **Service Initialization**: Modified DI container registration to include boots data in service constructors
+
+### Technical Details
+- **New Equipment Slot**: BOOTS slot allows equipping boots-type items only
+- **Data Structure**: BootsList integrated with shared data system using icon, bonusType, bonusValue format
+- **Type Safety**: Added BOOTS enum to ItemType and SlotName enumerations
+- **Service Architecture**: Extended InventoryClientService and InventoryService with boots support
+
+### Next Steps
+- Complete drag-and-drop inventory UI implementation
+- Add item rarity colors and visual effects
+- Implement comprehensive item tooltips with stats
+- Create inventory filtering and search system
+
 ## [0.0.17] - 2025-11-29
 
 ### Added

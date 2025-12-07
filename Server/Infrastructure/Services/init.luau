@@ -21,8 +21,9 @@ function Services:_registerServices()
 		local inventoryRepository = container:resolve("InventoryRepository")
 		local amuletsList = container:resolve("Shared.Data").AmuletsList
 		local ringsList = container:resolve("Shared.Data").RingsList
+		local bootsList = container:resolve("Shared.Data").BootsList
 		local equipmentSlot = container:resolve("Shared.Domain").entities.EquipmentSlot
-		return InventoryService.new(logger, inventoryRepository, amuletsList, ringsList, equipmentSlot)
+		return InventoryService.new(logger, inventoryRepository, amuletsList, ringsList, bootsList, equipmentSlot)
 	end)
 
 	-- Регистрация InventoryRemoteService
