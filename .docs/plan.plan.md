@@ -1,60 +1,60 @@
-# Система инвентаря игрока
+# Player Inventory System
 
-## Общее описание
-✅ **Система инвентаря игрока реализована и готова к использованию**
+## General Description
+✅ **Player inventory system is implemented and ready for use**
 
-У игрока есть возможность надевать и снимать различные предметы экипировки: мечи, броню, кольца, амулеты, фрукты. Система включает drag-and-drop интерфейс в стиле Diablo с сеткой инвентаря и специальными слотами экипировки.
+The player can equip and unequip various equipment items: swords, armor, rings, amulets, fruits. The system includes a drag-and-drop interface in Diablo style with an inventory grid and special equipment slots.
 
-## Архитектура проекта
-Проект использует **Clean Architecture** с разделением на слои:
-- **Shared**: общая бизнес-логика и инфраструктура
-- **Server**: серверная логика и хранение данных
-- **Client**: пользовательский интерфейс
+## Project Architecture
+The project uses **Clean Architecture** with layer separation:
+- **Shared**: common business logic and infrastructure
+- **Server**: server logic and data storage
+- **Client**: user interface
 
-### ✅ Реализованная инфраструктура
-- **DI Container**: dependency injection с singleton/transient паттернами
-- **Сервисы**: RemoteEvent, Logger, FeatureFlag
-- **Репозиторий игроков**: интеграция с MetaService, кэширование
-- **Документация**: подробное руководство по MetaService
+### ✅ Implemented Infrastructure
+- **DI Container**: dependency injection with singleton/transient patterns
+- **Services**: RemoteEvent, Logger, FeatureFlag
+- **Player Repository**: MetaService integration, caching
+- **Documentation**: detailed MetaService guide
 
-### ✅ Реализованные Domain Entities
-- **Player**: сущность игрока с методами управления инвентарем
-- **Item**: сущность предметов с типами, редкостью и свойствами
-- **Inventory**: логика управления инвентарем и экипировкой
-- **EquipmentSlot**: слоты экипировки (левая рука, правая рука, шлем)
+### ✅ Implemented Domain Entities
+- **Player**: player entity with inventory management methods
+- **Item**: item entity with types, rarity and properties
+- **Inventory**: inventory and equipment management logic
+- **EquipmentSlot**: equipment slots (left hand, right hand, helmet)
 
-## Этапы реализации
+## Implementation Stages
 
-### ✅ Этап 1: Domain Entities (Завершен)
-- Создать сущности: Player, Item, Inventory, EquipmentSlot
-- Определить структуру данных инвентаря
-- Реализовать бизнес-правила валидации
+### ✅ Stage 1: Domain Entities (Completed)
+- Create entities: Player, Item, Inventory, EquipmentSlot
+- Define inventory data structure
+- Implement business validation rules
 
-### ✅ Этап 2: Серверная логика инвентаря (Завершен)
-- Создать InventoryRepository для работы с инвентарем
-- Реализовать логику экипировки/снятия предметов
-- Интеграция с MetaService для хранения данных
+### ✅ Stage 2: Server Inventory Logic (Completed)
+- Create InventoryRepository for inventory operations
+- Implement item equipping/unequipping logic
+- MetaService integration for data storage
 
-### ✅ Этап 3: Client UI (стиль Diablo) (Завершен)
-- Создать drag-and-drop интерфейс
-- Реализовать сетку ячеек для хранения предметов
-- Добавить специальные слоты экипировки
-- Реализовать отображение бонусов предметов
+### ✅ Stage 3: Client UI (Diablo Style) (Completed)
+- Create drag-and-drop interface
+- Implement item storage grid cells
+- Add special equipment slots
+- Implement item bonus display
 
-### ✅ Этап 4: Сетевая синхронизация (Завершена)
-- Remote events для клиент-сервер коммуникации
-- Синхронизация состояния инвентаря
-- Обработка конфликтов и ошибок
+### ✅ Stage 4: Network Synchronization (Completed)
+- Remote events for client-server communication
+- Inventory state synchronization
+- Conflict and error handling
 
-## Детали реализации
+## Implementation Details
 
-### Слоты экипировки
-Всего три слота для мечей:
-- **Левая рука**: основной слот для оружия
-- **Правая рука**: альтернативный слот для оружия
-- **Шлем**: специальный слот (меч вместо шлема)
+### Equipment Slots
+Total of three slots for swords:
+- **Left Hand**: main weapon slot
+- **Right Hand**: alternative weapon slot
+- **Helmet**: special slot (sword instead of helmet)
 
-### Структура хранения данных
+### Data Storage Structure
 ```lua
 metaPlayer.Data.Inventory = {
     equippedItems = {
@@ -69,24 +69,24 @@ metaPlayer.Data.Inventory = {
 }
 ```
 
-### UI концепция (Diablo-style)
-- **Drag-and-drop**: перетаскивание предметов между слотами
-- **Grid layout**: сетка 5x5 или 6x6 ячеек для инвентаря
-- **Equipment panel**: три выделенных слота для экипировки
-- **Visual feedback**: подсветка валидных/невалидных действий
+### UI Concept (Diablo-style)
+- **Drag-and-drop**: dragging items between slots
+- **Grid layout**: 5x5 or 6x6 grid cells for inventory
+- **Equipment panel**: three highlighted slots for equipment
+- **Visual feedback**: highlighting valid/invalid actions
 
-## Текущее состояние
-- ✅ Архитектура готова
-- ✅ Инфраструктура реализована
-- ✅ Domain entities (реализованы)
-- ✅ Server inventory logic (реализовано)
-- ✅ Client UI (реализовано)
-- ✅ Network sync (реализовано)
+## Current State
+- ✅ Architecture ready
+- ✅ Infrastructure implemented
+- ✅ Domain entities (implemented)
+- ✅ Server inventory logic (implemented)
+- ✅ Client UI (implemented)
+- ✅ Network sync (implemented)
 
-## Следующие шаги
-1. **Рефактор Shared.Data** под новую структуру данных
-2. **Тестирование системы** в игре
-3. **Оптимизация производительности** UI и сетевых вызовов
-4. **Добавить больше типов предметов** (кольца, амулеты, фрукты)
-5. **Улучшить визуальный дизайн** интерфейса
-6. **Добавить анимации** и звуковые эффекты
+## Next Steps
+1. **Refactor Shared.Data** for new data structure
+2. **System testing** in the game
+3. **Performance optimization** for UI and network calls
+4. **Add more item types** (rings, amulets, fruits)
+5. **Improve visual design** of the interface
+6. **Add animations** and sound effects

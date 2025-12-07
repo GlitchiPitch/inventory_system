@@ -1,39 +1,39 @@
-# Руководство по работе с MetaService
+# MetaService Usage Guide
 
-## Обзор
+## Overview
 
-MetaService - это система персистентного хранения данных в Roblox проектах. Предоставляет автоматическое сохранение данных игроков с простой API для чтения/записи.
+MetaService is a persistent data storage system in Roblox projects. Provides automatic player data saving with a simple API for reading/writing.
 
-## Основные концепции
+## Core Concepts
 
-### Получение объекта игрока
+### Getting Player Object
 
 ```lua
 local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
 local MetaService = require(ServerScriptService.MetaService)
 
--- Получить объект игрока
+-- Get player object
 local playerInstance = Players:GetPlayerByUserId(userId)
 local metaPlayer = MetaService.Class.Player:Get(playerInstance)
 
 if not metaPlayer then
-    -- Игрок не найден или не инициализирован
+    -- Player not found or not initialized
     return
 end
 ```
 
-### Структура данных
+### Data Structure
 
-Все данные хранятся в поле `metaPlayer.Data`:
+All data is stored in the `metaPlayer.Data` field:
 
 ```lua
 metaPlayer.Data = {
-    -- Простые значения
+    -- Simple values
     ["HW_Pumpkin"] = 100000,
     ["HW_Stars"] = 500,
 
-    -- Вложенные таблицы для комплексных данных
+    -- Nested tables for complex data
     ["Inventory"] = {
         equippedItems = {
             leftHand = "sword_001",
@@ -54,18 +54,18 @@ metaPlayer.Data = {
 }
 ```
 
-## Паттерны использования
+## Usage Patterns
 
-### 1. Инициализация данных для нового игрока
+### 1. Initializing Data for New Player
 
 ```lua
 function initializePlayerData(metaPlayer, userId)
-    -- Инициализация валют
+    -- Initialize currencies
     if not metaPlayer.Data["HW_Pumpkin"] then
         metaPlayer.Data["HW_Pumpkin"] = 0
     end
 
-    -- Инициализация инвентаря
+    -- Initialize inventory
     local inventory = metaPlayer.Data.Inventory
     if not inventory then
         inventory = {
@@ -79,7 +79,7 @@ function initializePlayerData(metaPlayer, userId)
         metaPlayer.Data.Inventory = inventory
     end
 
-    -- Инициализация других систем
+    -- Initialize other systems
     local battlepassData = metaPlayer.Data.BattlepassShop
     if not battlepassData then
         battlepassData = {
@@ -91,7 +91,7 @@ function initializePlayerData(metaPlayer, userId)
 end
 ```
 
-### 2. Чтение данных
+### 2. Reading Data
 
 ```lua
 function getPlayerInventory(metaPlayer)
@@ -107,31 +107,31 @@ function getPlayerCurrency(metaPlayer, currencyType)
 end
 ```
 
-### 3. Сохранение данных
+### 3. Saving Data
 
 ```lua
 function savePlayerInventory(metaPlayer, inventoryData)
-    -- Получить текущие данные для сохранения существующих полей
+    -- Get current data to preserve existing fields
     local currentInventory = metaPlayer.Data.Inventory or {}
 
-    -- Обновить данные, сохраняя совместимость
+    -- Update data while maintaining compatibility
     metaPlayer.Data.Inventory = {
         equippedItems = inventoryData.equippedItems,
         inventorySlots = inventoryData.inventorySlots,
-        -- Сохранить другие поля, если они есть
+        -- Preserve other fields if they exist
         lastModified = currentInventory.lastModified or os.time()
     }
 
-    -- MetaService автоматически сохранит изменения
+    -- MetaService will automatically save changes
 end
 
 function updatePlayerCurrency(metaPlayer, currencyType, amount)
     metaPlayer.Data[currencyType] = amount
-    -- Автоматическое сохранение
+    -- Automatic saving
 end
 ```
 
-### 4. Удаление данных
+### 4. Deleting Data
 
 ```lua
 function clearPlayerInventory(metaPlayer)
@@ -139,18 +139,18 @@ function clearPlayerInventory(metaPlayer)
 end
 
 function resetPlayerData(metaPlayer)
-    metaPlayer.Data = {}  -- Полная очистка всех данных
+    metaPlayer.Data = {}  -- Complete clearing of all data
 end
 ```
 
-## Лучшие практики
+## Best Practices
 
-### Организация данных
-- Используйте вложенные таблицы для группировки связанных данных
-- Используйте понятные ключи (Inventory, BattlepassShop, HW_Pumpkin)
-- Храните простые значения (числа, строки) на верхнем уровне
+### Data Organization
+- Use nested tables to group related data
+- Use clear keys (Inventory, BattlepassShop, HW_Pumpkin)
+- Store simple values (numbers, strings) at the top level
 
-### Обработка ошибок
+### Error Handling
 ```lua
 function safeGetPlayerData(userId)
     local playerInstance = Players:GetPlayerByUserId(tonumber(userId))
@@ -169,12 +169,12 @@ function safeGetPlayerData(userId)
 end
 ```
 
-### Производительность
-- Избегайте частых мелких обновлений - группируйте изменения
-- Используйте кэширование для часто читаемых данных
-- Очищайте кэш при выходе игрока
+### Performance
+- Avoid frequent small updates - group changes together
+- Use caching for frequently read data
+- Clear cache when player leaves
 
-### Отладка
+### Debugging
 ```lua
 function debugPlayerData(metaPlayer, userId)
     print("=== Player Data Debug ===")
@@ -195,14 +195,14 @@ function debugPlayerData(metaPlayer, userId)
 end
 ```
 
-## Интеграция с системами
+## System Integration
 
-### С репозиториями
+### With Repositories
 ```lua
 local DataStorePlayerRepository = {}
 
 function DataStorePlayerRepository:getById(userId)
-    -- ... получение metaPlayer ...
+    -- ... getting metaPlayer ...
 
     local playerEntity = self.domain.entities.Player.new(userId)
     playerEntity.inventory = getPlayerInventory(metaPlayer)
@@ -215,7 +215,7 @@ function DataStorePlayerRepository:getById(userId)
 end
 
 function DataStorePlayerRepository:save(playerEntity)
-    -- ... получение metaPlayer ...
+    -- ... getting metaPlayer ...
 
     savePlayerInventory(metaPlayer, playerEntity.inventory)
     updatePlayerCurrency(metaPlayer, "HW_Pumpkin", playerEntity.currencies.pumpkins)
@@ -223,11 +223,11 @@ function DataStorePlayerRepository:save(playerEntity)
 end
 ```
 
-### С Feature Flags
+### With Feature Flags
 ```lua
 function initializeDebugData(metaPlayer, featureFlagService)
     if featureFlagService:isEnabled("DEBUG_MODE") then
-        metaPlayer.Data["HW_Pumpkin"] = 1000000  -- Стартовые ресурсы для тестов
+        metaPlayer.Data["HW_Pumpkin"] = 1000000  -- Starting resources for tests
         metaPlayer.Data.Inventory = {
             equippedItems = {
                 leftHand = "debug_sword",
@@ -244,23 +244,23 @@ function initializeDebugData(metaPlayer, featureFlagService)
 end
 ```
 
-## Типичные ошибки
+## Common Mistakes
 
-1. **Отсутствие проверки существования metaPlayer**
+1. **Missing metaPlayer existence check**
    ```lua
-   -- Плохо
+   -- Bad
    local data = metaPlayer.Data.Inventory
 
-   -- Хорошо
+   -- Good
    local data = metaPlayer and metaPlayer.Data.Inventory or {}
    ```
 
-2. **Перезапись существующих данных**
+2. **Overwriting existing data**
    ```lua
-   -- Плохо - теряем CoinsPurchaseCount
+   -- Bad - losing CoinsPurchaseCount
    metaPlayer.Data.BattlepassShop = {ownedItems = newItems}
 
-   -- Хорошо - сохраняем существующие поля
+   -- Good - preserve existing fields
    local current = metaPlayer.Data.BattlepassShop or {}
    metaPlayer.Data.BattlepassShop = {
        ownedItems = newItems,
@@ -268,9 +268,9 @@ end
    }
    ```
 
-3. **Отсутствие инициализации для новых игроков**
+3. **Missing initialization for new players**
    ```lua
-   -- Всегда проверяйте и инициализируйте данные
+   -- Always check and initialize data
    local inventory = metaPlayer.Data.Inventory
    if not inventory then
        inventory = {equippedItems = {}, inventorySlots = {}}

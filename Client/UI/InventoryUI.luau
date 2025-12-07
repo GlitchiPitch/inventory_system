@@ -117,27 +117,7 @@ function InventoryUI:createUI()
 			self:toggleDeleteMode()
 		end)
 		self:updateDeleteModeButton()
-	else
 	end
-
-	-- -- Найти кнопку сброса инвентаря
-	-- self.resetButton = self.equipmentFrame:FindFirstChild("ResetButton")
-	-- if self.resetButton then
-	-- 	self.logger:debug("InventoryUI", "ResetButton found, connecting click handler")
-	-- 	self.resetButton.MouseButton1Click:Connect(function()
-	-- 		self:resetInventory()
-	-- 	end)
-	-- else
-	-- 	self.logger:warn("InventoryUI", "ResetButton not found")
-	-- end
-
-	-- -- Найти TextLabel для информации о слотах
-	-- self.slotsInfoLabel = self.mainFrame:FindFirstChild("SlotsInfoLabel")
-	-- if self.slotsInfoLabel then
-	-- 	self.logger:debug("InventoryUI", "SlotsInfoLabel found")
-	-- else
-	-- 	self.logger:warn("InventoryUI", "SlotsInfoLabel not found")
-	-- end
 
 	self.mainFrame:GetPropertyChangedSignal("Visible"):Connect(function()
 		local visible = self.mainFrame.Visible
@@ -347,7 +327,6 @@ function InventoryUI:onSlotClicked(slotId)
 		-- Выделяем текущий слот
 		if self.itemSlots[slotId] then
 			self.itemSlots[slotId].BorderColor3 = Color3.fromRGB(255, 255, 0) -- Желтая рамка для выделения
-		else
 		end
 
 		-- Проверяем, экипирован ли уже этот конкретный слот
@@ -361,7 +340,6 @@ function InventoryUI:onSlotClicked(slotId)
 					break
 				end
 			end
-		else
 		end
 
 		if isEquipped then

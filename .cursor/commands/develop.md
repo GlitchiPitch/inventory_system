@@ -1,48 +1,48 @@
-# Команда /develop
+# /develop Command
 
-**Описание:** Анализирует документацию проекта и выводит план реализации текущего этапа разработки
+**Description:** Analyzes project documentation and outputs the implementation plan for the current development stage
 
-## Последовательность действий
+## Action Sequence
 
-### 1. Анализ документации проекта
-- Чтение IMPLEMENTATION_TODO.md для определения текущего статуса
-- Анализ .docs/shop-implementation-plan.md для понимания этапов
-- Определение незавершенных задач и приоритетов
+### 1. Project Documentation Analysis
+- Reading IMPLEMENTATION_TODO.md to determine current status
+- Analysis of .docs/shop-implementation-plan.md to understand stages
+- Determination of unfinished tasks and priorities
 
-### 2. Определение текущего этапа разработки
-- Выявление активного этапа по версии (v0.2.0 - Application Layer)
-- Анализ зависимостей между задачами
-- Определение критических задач для продолжения
+### 2. Determination of Current Development Stage
+- Identification of active stage by version (v0.2.0 - Application Layer)
+- Analysis of dependencies between tasks
+- Determination of critical tasks for continuation
 
-### 3. Формирование плана реализации
-- Группировка задач по приоритетам
-- Определение последовательности выполнения
-- Выявление блокирующих зависимостей
+### 3. Formation of Implementation Plan
+- Grouping tasks by priorities
+- Determination of execution sequence
+- Identification of blocking dependencies
 
-### 4. Вывод плана в чат
-- Отображение текущего этапа и версии
-- Перечень задач с указанием статуса
-- Рекомендации по следующим шагам
+### 4. Output Plan to Chat
+- Display of current stage and version
+- List of tasks with status indication
+- Recommendations for next steps
 
-## Формат вывода
+## Output Format
 ```
-🚀 План реализации этапа разработки:
+🚀 Development Stage Implementation Plan:
 
-### Текущий этап: Application Layer Implementation (v0.2.0)
+### Current Stage: Application Layer Implementation (v0.2.0)
 
-#### Приоритет 1: Core Purchase Use Cases
+#### Priority 1: Core Purchase Use Cases
 - [ ] PurchaseGamePassUseCase.luau
 - [ ] PurchaseSoftCurrencyItemUseCase.luau
 - [ ] ValidatePurchaseUseCase.luau
 - [ ] CheckPurchaseLimitUseCase.luau
 
-#### Приоритет 2: Catalog Management
+#### Priority 2: Catalog Management
 - [ ] GetProductCatalogUseCase.luau
-- [ ] Управление категориями товаров
+- [ ] Product category management
 
-#### Приоритет 3: Gift System Integration
+#### Priority 3: Gift System Integration
 - [ ] SendGiftUseCase.luau
 - [ ] ReceiveGiftUseCase.luau
 
-**Следующий шаг:** Реализовать use cases для покупок в Application Layer
+**Next Step:** Implement purchase use cases in Application Layer
 ```

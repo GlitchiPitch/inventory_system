@@ -48,31 +48,6 @@ A comprehensive inventory and equipment management system for Roblox games, buil
 - [Rojo](https://rojo.space/) 7.6.1+
 - [Aftman](https://github.com/LPGhatguy/aftman) for tooling
 
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd inventory-system-aae/v0
-   ```
-
-2. **Install dependencies**
-   ```bash
-   aftman install
-   ```
-
-3. **Build the place**
-   ```bash
-   rojo build -o "v0.rbxlx"
-   ```
-
-4. **Open in Roblox Studio**
-   - Open `v0.rbxlx` in Roblox Studio
-   - Start Rojo server:
-   ```bash
-   rojo serve
-   ```
-
 ## 📖 Usage
 
 ### Basic Inventory Operations
@@ -139,16 +114,6 @@ Each item provides bonuses displayed with icons:
 
 3. **Add item type support** if needed in `Shared/Domain/Entities/Item.luau`
 
-### Testing
-
-```bash
-# Run linter
-selene .
-
-# Build and test
-rojo build -o "test.rbxlx"
-```
-
 ## 📋 API Reference
 
 ### InventoryClientService
@@ -196,6 +161,7 @@ This project is part of the Roblox Inventory System implementation.
 
 ## 📚 Additional Resources
 
+- [Changelog](CHANGELOG.md)
 - [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Rojo Documentation](https://rojo.space/docs)
 - [Roblox Lua Style Guide](https://create.roblox.com/docs/reference/engine/globals/LuaGlobals)

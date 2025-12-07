@@ -1,41 +1,41 @@
-# Команда /start
+# /start Command
 
-**Описание:** Инициализирует работу над проектом, анализируя текущее состояние и определяя следующие этапы разработки
+**Description:** Initializes work on the project by analyzing the current state and determining the next development stages
 
-## Последовательность действий
+## Action Sequence
 
-### 1. Проверка документации проекта
-- Поиск папки `.docs` в корне проекта
-- Если папка не существует - создание и добавление файла с описанием состояния проекта
-- Если папка существует - чтение и анализ существующей документации
+### 1. Project Documentation Check
+- Search for `.docs` folder in project root
+- If folder doesn't exist - create and add file with project state description
+- If folder exists - read and analyze existing documentation
 
-### 2. Анализ состояния проекта
-- Проверка IMPLEMENTATION_TODO.md на актуальность
-- Анализ завершенных и незавершенных задач
-- Оценка текущего прогресса разработки
+### 2. Project State Analysis
+- Check IMPLEMENTATION_TODO.md for relevance
+- Analysis of completed and unfinished tasks
+- Assessment of current development progress
 
-### 3. Определение следующих этапов
-- Выявление приоритетных задач для реализации
-- Определение зависимостей между компонентами
-- Планирование последовательности разработки
+### 3. Determination of Next Stages
+- Identification of priority tasks for implementation
+- Determination of dependencies between components
+- Planning of development sequence
 
-### 4. Вывод информации
-- Отображение текущего статуса проекта в чате
-- Перечень следующих этапов разработки
-- Рекомендации по приоритетам реализации
+### 4. Information Output
+- Display of current project status in chat
+- List of next development stages
+- Recommendations on implementation priorities
 
-## Формат вывода
+## Output Format
 ```
-📋 Следующие этапы разработки:
+📋 Next Development Stages:
 
-### Этап 1: {Название этапа} (v{X}.{Y}.{Z}) - ПРИОРИТЕТ
-- [ ] Задача 1
-- [ ] Задача 2
-- [ ] Задача 3
+### Stage 1: {Stage Name} (v{X}.{Y}.{Z}) - PRIORITY
+- [ ] Task 1
+- [ ] Task 2
+- [ ] Task 3
 
-### Этап 2: {Название этапа}
-- [ ] Задача 1
-- [ ] Задача 2
+### Stage 2: {Stage Name}
+- [ ] Task 1
+- [ ] Task 2
 
-**Следующий шаг:** {конкретные рекомендации}
+**Next Step:** {specific recommendations}
 ```

@@ -1,35 +1,35 @@
-# Команда /commit
+# /commit Command
 
-**Описание:** Выполняет полный цикл коммита с обновлением документации и версии игры
+**Description:** Performs a complete commit cycle with documentation and game version updates
 
-## Последовательность действий
+## Action Sequence
 
-### 1. Обновление документации
-- Проверка и обновление CHANGELOG.md
-- Обновление IMPLEMENTATION_TODO.md
-- Проверка актуальности других документов в docs/
+### 1. Documentation Update
+- Review and update CHANGELOG.md
+- Update IMPLEMENTATION_TODO.md
+- Check relevance of other documents in docs/
 
-### 2. Обновление версии игры
-- Инкремент версии в GameVersion.model.json
-- Обновление номера версии в коде (если применимо)
-- Проверка совместимости версий
+### 2. Game Version Update
+- Increment version in GameVersion.model.json
+- Update version number in code (if applicable)
+- Check version compatibility
 
-### 3. Анализ и планирование
-- Проверка статуса задач в IMPLEMENTATION_TODO.md
-- Определение следующих шагов разработки
-- Оценка прогресса проекта
+### 3. Analysis and Planning
+- Check task status in IMPLEMENTATION_TODO.md
+- Determine next development steps
+- Assess project progress
 
-### 4. Создание коммита
-- Формирование сообщения коммита с новой версией
-- Добавление всех изменений в индекс
-- Выполнение коммита с описанием версии
-- Коммит делать на английском языке
+### 4. Creating Commit
+- Form commit message with new version
+- Add all changes to index
+- Execute commit with version description
+- Commit must be made in English language
 
-## Формат коммита
+## Commit Format
 ```
-v{X}.{Y}.{Z} - {краткое описание изменений}
+v{X}.{Y}.{Z} - {brief description of changes}
 
-- Изменение 1
-- Изменение 2
-- Следующие шаги: {план на следующую версию}
+- Change 1
+- Change 2
+- Next steps: {plan for next version}
 ```

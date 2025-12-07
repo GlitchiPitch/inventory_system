@@ -30,7 +30,6 @@ function InventoryClientService:setupEventHandlers()
 		self._inventoryData = args
 		if self._onInventoryUpdated then
 			self._onInventoryUpdated(self._inventoryData)
-		else
 		end
 	end)
 
@@ -61,7 +60,6 @@ function InventoryClientService:setupEventHandlers()
 
 		if self._onItemEquipped then
 			self._onItemEquipped(args.slotId, args.slotName)
-		else
 		end
 	end)
 

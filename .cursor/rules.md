@@ -1,12 +1,12 @@
-оставлять в коде записи -- TODO: для дальнейших действий
-названия методов с маленькой буквы camelCase
-при реализации новых модулей, инициализация и подключение к основной системе делается в последнюю очередь
+leave -- TODO: entries in code for further actions
+method names with lowercase camelCase
+when implementing new modules, initialization and connection to the main system is done last
 
 
-Прямые импорты только дочерних объектов пример (script.<Module>) запрещены импорты (script.Parent)
+Direct imports only for child objects example (script.<Module>) imports (script.Parent) are forbidden
 
 
-Пример как выглядит главный класс клиента и сервера
+Example of how the main client and server class looks
 ```lua
 ---@class MainClass
 local MainClass = {}
@@ -18,9 +18,9 @@ function MainClass:start() end
 
 ```
 
-Клиент стартует после инициализации сервера, клиент узнает о том что сервер загрузился через проверку аттрибута у ReplicatedStorage:GetAttribute("ServerIsLoaded")
+Client starts after server initialization, client learns that server has loaded through attribute check in ReplicatedStorage:GetAttribute("ServerIsLoaded")
 
-Пример проверки
+Check example
 ```lua
 local client = Client.new()
 
@@ -36,4 +36,4 @@ end
 
 ```
 
-инициализация слоев 
+layer initialization 
